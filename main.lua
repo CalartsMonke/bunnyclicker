@@ -2,6 +2,8 @@ require 'love'
 local world = require 'world'
 local Player = require 'src.player'
 
+local debugChart = require 'src.debugchart'
+
 --require images
 local textureCursor = love.graphics.newImage('/img/cursor.png/')
 
@@ -42,6 +44,13 @@ function love.update()
     print(player.x)
     print(player.y)
 
+    local playerx = tostring(player.x)
+    local playery = tostring(player.y)
+    local testmsg = "This is a test message"
+    debugChart:AddToChart(playerx)
+    debugChart:AddToChart(playery)
+    debugChart:AddToChart(testmsg)
+
 end
 
 function love.keypressed(key, scancode, isrepeat)
@@ -61,4 +70,8 @@ function love.draw()
     love.graphics.draw(textureCursor, mx - 8, my - 8)
     --Draw debug rectangle box
     love.graphics.rectangle('line', gameBoxStart, gameBoxStartY, gameBoxWidth, gameBoxHeight)
+
+
+    --draw debug chart
+    debugChart:DrawDebugMessage(10, 10, 0, 16)
 end
