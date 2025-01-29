@@ -13,3 +13,5 @@ end
 function Entity:draw()
 
 end
+
+return Entity
