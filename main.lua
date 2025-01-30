@@ -4,6 +4,7 @@ love.graphics.setDefaultFilter("nearest", "nearest")
 
 local world = require 'world'
 local Player = require 'src.player'
+local Enemy = require 'src.enemy.enemy'
 
 local debugChart = require 'src.debugchart'
 
@@ -43,9 +44,24 @@ love.mouse.setVisible(true) -- set cursor to false
 
 local player = Player()
 
+local listOfEnemies = {}
+
+
 function love.load()
     
+
+    --add enemies to list
+    table.insert(listOfEnemies, Enemy(gameBoxWidth*0.5, gameBoxHeight* 0.2))
+    table.insert(listOfEnemies, Enemy(gameBoxWidth * 0.3, gameBoxHeight * 0.3))
+    table.insert(listOfEnemies, Enemy(gameBoxWidth/2, gameBoxHeight/2))
 end
+
+function love.mousepressed(x, y, button, istouch)
+    if button == 1 then -- Versions prior to 0.10.0 use the MouseConstant 'l'
+        player.leftmbpressed = true
+    end
+ end
+
 
 function love.update()
 
@@ -86,8 +102,16 @@ function love.update()
     end
     debugChart:AddToChart("insidebox: "..tostring(player.insideBox))
 
+
+    local worldItems, worldLen = world:getItems()
+    for i = 1, worldLen do
+        local item = worldItems[i]
+        item:update(dt)
+    end
+
+
+
     --Update player
-    player:update(dt)
     world:update(player, player.x, player.y)
     player.x = mx
     player.y = my
