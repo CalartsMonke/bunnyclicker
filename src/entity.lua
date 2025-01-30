@@ -14,4 +14,8 @@ function Entity:draw()
 
 end
 
+function Entity:Destroy()
+self.world:remove(self)
+end
+
 return Entity

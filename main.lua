@@ -28,16 +28,17 @@ local mx, my
     local canvas = love.graphics.newCanvas(640, 360)
 
     --Canvas scaling
-    local maxScaleX = love.graphics.getWidth() / canvas:getWidth()
-    local maxScaleY = love.graphics.getHeight() / canvas:getHeight()
-    local scale = math.min(maxScaleX, maxScaleY)
+    local maxScaleX 
+    local maxScaleY 
+    
+    local scale = 1
 
 
 
 
 
 --turn off mouse cursor (which will have a a sprite drawn at it instead
-love.mouse.setVisible(false) -- set cursor to false
+love.mouse.setVisible(true) -- set cursor to false
 
 
 local player = Player()
@@ -50,12 +51,23 @@ function love.update()
 
 
     --get scaled mx and my
-    local scaledScreenX, scaledScreenY = love.graphics.getWidth() * scale, love.graphics.getHeight() * scale
-    local screenX, screenY = love.graphics.getWidth(), love.graphics.getHeight()
+    local scaledScreenX, scaledScreenY = love.graphics.getWidth() / scale, love.graphics.getHeight() / scale
+    local screenX, screenY = gameWidth, gameHeight
     local mouseOffX = (screenX - scaledScreenX) / 2
     local mouseOffY = (screenY - scaledScreenY) / 2
+    --alt
+    --local mouseOffX = (scaledScreenX - screenX) / 2
+    --local mouseOffY = (scaledScreenY - screenY) / 2
 
-    mx, my = (love.mouse.getX() / scale) - mouseOffX, (love.mouse.getY() / scale) - mouseOffY
+
+    debugChart:AddToChart(tostring(scaledScreenX))
+    debugChart:AddToChart(tostring(screenX))
+
+    debugChart:AddToChart(tostring(mouseOffX))
+    debugChart:AddToChart(tostring(mouseOffY))
+    
+
+    mx, my = (love.mouse.getX() / scale) + mouseOffX, (love.mouse.getY() / scale) + mouseOffY
 
 
 
@@ -66,24 +78,27 @@ function love.update()
     if (mx > gameBoxStart and mx < gameBoxStart + gameBoxWidth) and (my > gameBoxStartY and my < gameBoxStartY + gameBoxHeight) then
         print('you are in the box')
         boxcheck = "YOU ARE IN BOX"
+        player.insideBox = true
     else
         print('you are not in the box and need to get in it')
         boxcheck = 'YOU ARE NOT IN BOX'
+        player.insideBox = false
     end
-    debugChart:AddToChart(boxcheck)
+    debugChart:AddToChart("insidebox: "..tostring(player.insideBox))
 
     --Update player
     player:update(dt)
     world:update(player, player.x, player.y)
+    player.x = mx
+    player.y = my
     print(player.x)
     print(player.y)
 
     local playerx = tostring(player.x)
     local playery = tostring(player.y)
-    local testmsg = "This is a test message"
-    debugChart:AddToChart(playerx)
-    debugChart:AddToChart(playery)
-    debugChart:AddToChart(testmsg)
+    
+    debugChart:AddToChart(player.boxX)
+    debugChart:AddToChart(player.boxY)
 
 end
 
@@ -115,7 +130,7 @@ function love.draw()
 
     love.graphics.print("Center", gameWidth/2, gameHeight/2)
 
-    love.graphics.draw(textureCursor, mx *scale, my*scale, 0, 1, 1, -8, -8)
+    love.graphics.draw(textureCursor, mx, my, 0, 1, 1, 0, -0)
     --Draw debug rectangle box
     love.graphics.rectangle('line', gameBoxStart, gameBoxStartY, gameBoxWidth, gameBoxHeight)
 
@@ -123,13 +138,22 @@ function love.draw()
     --draw debug chart
     debugChart:DrawDebugMessage(10, 10, 0, 16)
 
+
+    --Draw items im too lazy to sort rn
+    local worldItems, worldLen = world:getItems()
+    for i = 1, worldLen do
+        local item = worldItems[i]
+        item:draw()
+    end
+
     --return canvas to normal
     love.graphics.setCanvas()
 
     --Canvas scaling
-    local maxScaleX = love.graphics.getWidth() / canvas:getWidth()
-    local maxScaleY = love.graphics.getHeight() / canvas:getHeight()
-    local scale = math.min(maxScaleX, maxScaleY)
+    maxScaleX = love.graphics.getWidth() / canvas:getWidth()
+    maxScaleY = love.graphics.getHeight() / canvas:getHeight()
+    scale = math.min(maxScaleX, maxScaleY)
+    debugChart:AddToChart(tostring(scale))
 
 
     love.graphics.draw(canvas, love.graphics.getWidth() / 2, love.graphics.getHeight() / 2, 0, scale, scale, canvas:getWidth() / 2, canvas:getHeight() / 2)
