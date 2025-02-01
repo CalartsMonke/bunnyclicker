@@ -6,6 +6,8 @@ local world = require 'world'
 local Player = require 'src.player'
 local Enemy = require 'src.enemy.enemy'
 
+local game = require 'gameStats'
+
 local debugChart = require 'src.debugchart'
 
 --require images
@@ -42,18 +44,26 @@ local mx, my
 love.mouse.setVisible(true) -- set cursor to false
 
 
-local player = Player()
+local player = game.player
 
 local listOfEnemies = {}
 
+function InstanceCreate(x, y, obj)
+    local objectToSpawn = 'src.'..tostring(obj)
+    local object = require(objectToSpawn)
+    object(x, y)
+    object.x = x
+    object.y = y
+
+    return object
+ end
 
 function love.load()
     
 
     --add enemies to list
     table.insert(listOfEnemies, Enemy(gameBoxWidth*0.5, gameBoxHeight* 0.2))
-    table.insert(listOfEnemies, Enemy(gameBoxWidth * 0.3, gameBoxHeight * 0.3))
-    table.insert(listOfEnemies, Enemy(gameBoxWidth/2, gameBoxHeight/2))
+
 end
 
 function love.mousepressed(x, y, button, istouch)
@@ -62,8 +72,12 @@ function love.mousepressed(x, y, button, istouch)
     end
  end
 
+ --TEST
 
-function love.update()
+
+
+
+function love.update(dt)
 
 
     --get scaled mx and my
@@ -88,15 +102,11 @@ function love.update()
 
 
 
-    print("MX: "..mx)
-    print("MY: "..my)
     local boxcheck
     if (mx > gameBoxStart and mx < gameBoxStart + gameBoxWidth) and (my > gameBoxStartY and my < gameBoxStartY + gameBoxHeight) then
-        print('you are in the box')
         boxcheck = "YOU ARE IN BOX"
         player.insideBox = true
     else
-        print('you are not in the box and need to get in it')
         boxcheck = 'YOU ARE NOT IN BOX'
         player.insideBox = false
     end
@@ -115,8 +125,7 @@ function love.update()
     world:update(player, player.x, player.y)
     player.x = mx
     player.y = my
-    print(player.x)
-    print(player.y)
+ 
 
     local playerx = tostring(player.x)
     local playery = tostring(player.y)
@@ -153,8 +162,9 @@ function love.draw()
 
 
     love.graphics.print("Center", gameWidth/2, gameHeight/2)
-
+    if player.state ~= 2 then
     love.graphics.draw(textureCursor, mx, my, 0, 1, 1, 0, -0)
+    end
     --Draw debug rectangle box
     love.graphics.rectangle('line', gameBoxStart, gameBoxStartY, gameBoxWidth, gameBoxHeight)
 

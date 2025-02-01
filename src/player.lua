@@ -1,10 +1,14 @@
-local object = require 'lib.classic'
+local entity = require 'src.entity'
 local world = require 'world'
 local Resumesword = require 'src.resumesword'
 
-Player = object:extend();
+Player = entity:extend();
 
 function Player:new()
+self.states = {1, 2}
+self.state = 1
+
+
 self.x, self.y = 1, 1
 self.width, self.height = 16, 16
 self.boxX, self.boxY = self.x, self.y
@@ -13,13 +17,20 @@ self.resumesword = nil
 self.world = world
 
 --spawn inital sword
-self.resumesword = Resumesword(love.graphics.getWidth()/2, love.graphics.getHeight()/2 - 50)
+self.resumesword = Resumesword(love.graphics.getWidth()/2, love.graphics.getHeight()/2 - 50, love.graphics.getHeight()/2, love.graphics.getWidth()/2)
+self.resumesword.state = 2
 self.boxX = 0
 self.boxY = 0
 
 
 --damage stats
 self.baseDamage = 1
+
+--hp
+self.maxHp = 3
+self.currentHp = self.maxHp
+self.invicbilityMax = 0.5
+self.invicbility = self.invicbilityMax
 
 
 
@@ -28,7 +39,26 @@ print("THE PLAYER IS MADE")
 world:add(self, self.x, self.y, self.width, self.height)
 end
 
+function Player:TakeDamage(amt)
+    self.currentHp = self.currentHp - amt
+
+    self.invicbility = self.invicbility + self.invicbilityMax
+end
+
 function Player:update(dt)
+
+    --subtract invicbility
+    if self.invicbility >= 0 then
+        self.invicbility = self.invicbility - dt
+    end
+
+    if self.currentHp <= 0 then
+        self.state = 2
+    end
+
+
+    local sx, sy = self:getCenter()
+    
 
 
     --get if button is clicked
@@ -55,7 +85,7 @@ function Player:update(dt)
 
     elseif self.insideBox == false and (self.boxX > 0 or self.boxY > 0) then
 
-        self.resumesword = Resumesword(self.boxX, self.boxY)
+        self.resumesword = Resumesword(self.x, self.y, self.boxX, self.boxY)
         self.boxX = 0
         self.boxY = 0
     end
