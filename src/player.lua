@@ -2,7 +2,13 @@ local entity = require 'src.entity'
 local world = require 'world'
 local Resumesword = require 'src.resumesword'
 
-Player = entity:extend();
+local partStation = require 'src.particlestation'
+local partTable = require 'particletable'
+local sparklePart = require 'src.part.sparklepart'
+
+local chart = require 'src.debugchart'
+
+Player = Entity:extend()
 
 function Player:new()
 self.states = {1, 2}
@@ -16,12 +22,14 @@ self.insideBox = false
 self.resumesword = nil
 self.world = world
 
+--IMAGES
+self.image = love.graphics.newImage('/img/cursor.png/')
+
 --spawn inital sword
 self.resumesword = Resumesword(love.graphics.getWidth()/2, love.graphics.getHeight()/2 - 50, love.graphics.getHeight()/2, love.graphics.getWidth()/2)
 self.resumesword.state = 2
 self.boxX = 0
 self.boxY = 0
-
 
 --damage stats
 self.baseDamage = 1
@@ -29,7 +37,7 @@ self.baseDamage = 1
 --hp
 self.maxHp = 3
 self.currentHp = self.maxHp
-self.invicbilityMax = 0.5
+self.invicbilityMax = 1.5
 self.invicbility = self.invicbilityMax
 
 
@@ -45,6 +53,17 @@ function Player:TakeDamage(amt)
     self.invicbility = self.invicbility + self.invicbilityMax
 end
 
+local filter = function(item, other)
+    if item:is(Bullet) then
+        print("RETURNING NIL")
+        return 'cross'
+    end
+
+    if item:is(Player) then
+        return nil
+    end
+end
+
 function Player:update(dt)
 
     --subtract invicbility
@@ -56,10 +75,14 @@ function Player:update(dt)
         self.state = 2
     end
 
+    local hpString = 'HP: '..self.currentHp
+    local invString = 'INV: '..self.invicbility
+    chart:AddToChart(hpString)
+    chart:AddToChart(invString)
+
 
     local sx, sy = self:getCenter()
     
-
 
     --get if button is clicked
 
@@ -77,6 +100,8 @@ function Player:update(dt)
                 if (self.x > item.x and self.x < item.x + item.width) and (self.y > item.y and self.y < item.y + item.height) then
                     if self.leftmbpressed then
                         item:TakeDamage(self.baseDamage)
+                        local spark = sparklePart()
+                        table.insert(partTable ,partStation(self.x, self.y, spark.part, 6))
 
                     end
                 end
@@ -101,6 +126,9 @@ function Player:update(dt)
         end
     end
 
+    self.world:move(self, self.x, self.y, filter)
+
+
 
 
     --reset button clicked
@@ -108,6 +136,14 @@ function Player:update(dt)
 end
 
 function Player:draw()
+    if self.state == 1 then
+        local x,y,w,h = self.world:getRect(self)
+        love.graphics.setColor(0,1,0)
+        love.graphics.rectangle('fill', x, y, w, h)
+        love.graphics.setColor(1,1,1)
+
+        love.graphics.draw(self.image, self.x, self.y, 0, 1, 1, 0, -0)
+    end
 
 end
 

@@ -41,9 +41,15 @@ local function GetAngle(a, b)
 end
 
 local filter = function(item, other)
+    if item:is(Bullet) then
+        print("RETURNING NIL")
+        return 'cross'
+    end
 
-    return nil
-
+    if item:is(Player) then
+        print('RETURNING CROSS')
+        return 'cross'
+    end
 end
 
 function Bullet:update(dt)
@@ -51,18 +57,30 @@ function Bullet:update(dt)
 
     if self.bulletTimer <= 0 then
 
+        if self:is(Bullet) then
+            print("I AM A BULLET")
+        end
+
 
         local sx, sy = self:getCenter()
         local angle = self.direction
 
-        self.x = self.x + math.cos((angle)) * self.speed * dt
-        self.y = self.y + math.sin((angle)) * self.speed * dt
+        local newX = math.cos((angle)) * self.speed * dt
+        local newY = math.sin((angle)) * self.speed * dt
         
+        local cols, len
+        self.x, self.y, cols, len = self.world:move(self, self.x + newX, self.y + newY, filter) --idk why this don't work
+        --cols, len = self.world:queryRect(self.x, self.y, 16, 16)
 
-        local p = game.player
-        if (p.x > self.x and p.x < self.x + self.width) and (p.y > self.y and p.y < self.y + self.height) then
-            if p.invicbility > 0 then
-                p:TakeDamage(1)
+        for i=1, len do
+            local col = cols[i]
+            local item = col.other
+
+            if col.other:is(Player) then
+                if col.other.invicbility <= 0 then
+                    col.other:TakeDamage(1)
+                end
+                print("PLAYER TOOK DAMAGE")
             end
         end
 
@@ -77,7 +95,14 @@ function Bullet:update(dt)
 end
 
 function Bullet:draw()
+    local x,y,w,h = self.world:getRect(self)
+    love.graphics.setColor(0,1,0)
+    love.graphics.rectangle('fill', x, y, w, h)
+    love.graphics.setColor(1,1,1)
+
     love.graphics.draw(self.image, self.x, self.y)
+
+
 end
 
 return Bullet

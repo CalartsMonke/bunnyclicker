@@ -1,5 +1,6 @@
 require 'love'
 love.graphics.setDefaultFilter("nearest", "nearest")
+Object = require 'lib.classic'
 
 
 local world = require 'world'
@@ -23,6 +24,8 @@ local gameBoxWidth = gameBoxStart + (distToSubtract * 1.5)
 
 local gameBoxStartY = 20
 local gameBoxHeight = 230
+
+local partTable = require 'particletable'
 
 local mx, my
 
@@ -63,6 +66,11 @@ function love.load()
 
     --add enemies to list
     table.insert(listOfEnemies, Enemy(gameBoxWidth*0.5, gameBoxHeight* 0.2))
+    table.insert(listOfEnemies, Enemy(gameBoxWidth*0.3, gameBoxHeight* 0.75))
+    table.insert(listOfEnemies, Enemy(gameBoxWidth*0.8, gameBoxHeight* 0.5))
+
+
+    --Particles
 
 end
 
@@ -116,13 +124,32 @@ function love.update(dt)
     local worldItems, worldLen = world:getItems()
     for i = 1, worldLen do
         local item = worldItems[i]
+        if player.resumesword == nil then
         item:update(dt)
+        end
+        if player.resumesword ~= nil then
+            if item:is(Player) then
+                item:update(dt)
+            end
+            if item:is(Resumesword) then
+                item:update(dt)
+            end
+        end
+    end
+
+    --update particle table
+    local partTab = partTable
+    for i = 1, #partTab do
+        print("MAX Amount of partTables is "..#partTable)
+        print('Parttable is now '..i)
+        if i <= #partTable then
+        partTab[i]:update(dt)
+        end
     end
 
 
 
     --Update player
-    world:update(player, player.x, player.y)
     player.x = mx
     player.y = my
  
@@ -163,7 +190,7 @@ function love.draw()
 
     love.graphics.print("Center", gameWidth/2, gameHeight/2)
     if player.state ~= 2 then
-    love.graphics.draw(textureCursor, mx, my, 0, 1, 1, 0, -0)
+
     end
     --Draw debug rectangle box
     love.graphics.rectangle('line', gameBoxStart, gameBoxStartY, gameBoxWidth, gameBoxHeight)
@@ -172,6 +199,14 @@ function love.draw()
     --draw debug chart
     debugChart:DrawDebugMessage(10, 10, 0, 16)
 
+
+    --draw particles
+    
+
+    local partTab = partTable
+    for i = 1, #partTab do
+        partTab[i]:draw()
+    end
 
     --Draw items im too lazy to sort rn
     local worldItems, worldLen = world:getItems()

@@ -41,9 +41,9 @@ function Enemy:update(dt)
     --spawn bullets
     self.bulletTimer = self.bulletTimer - dt
     if self.bulletTimer <= 0 then
-        self.bulletTimer = self.bulletTimer + self.bulletTimerMax
+        self.bulletTimer = self.bulletTimer + self.bulletTimerMax + love.math.random(1, 50) * 0.10
 
-        self:SpawnBulletCircle(game.player, 4, 0.2, 50)
+        self:SpawnBulletCircle(game.player, 4, 0.60, 100)
     end
 end
 

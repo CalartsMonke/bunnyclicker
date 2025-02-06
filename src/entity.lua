@@ -1,6 +1,5 @@
-local object = require "lib.classic"
 
-Entity = object:extend()
+Entity = Object:extend()
 
 function Entity:new(x, y)
     self.x = x
