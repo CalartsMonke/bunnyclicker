@@ -97,7 +97,7 @@ end
 function Bullet:draw()
     local x,y,w,h = self.world:getRect(self)
     love.graphics.setColor(0,1,0)
-    love.graphics.rectangle('fill', x, y, w, h)
+    --love.graphics.rectangle('fill', x, y, w, h)
     love.graphics.setColor(1,1,1)
 
     love.graphics.draw(self.image, self.x, self.y)

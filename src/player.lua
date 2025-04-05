@@ -16,7 +16,9 @@ self.state = 1
 
 
 self.x, self.y = 1, 1
-self.width, self.height = 16, 16
+
+self.mOffX, self.mOffY = 8, 8
+self.width, self.height = 8, 8
 self.boxX, self.boxY = self.x, self.y
 self.insideBox = false
 self.resumesword = nil
@@ -33,12 +35,19 @@ self.boxY = 0
 
 --damage stats
 self.baseDamage = 1
+self.aggroAdd = 3
 
 --hp
 self.maxHp = 3
 self.currentHp = self.maxHp
 self.invicbilityMax = 1.5
 self.invicbility = self.invicbilityMax
+
+self.rotate = 0
+self.rotateMax = 0
+
+self.prevX = self.x
+self.prevY = self.y
 
 
 
@@ -64,7 +73,41 @@ local filter = function(item, other)
     end
 end
 
+function Player:updatePrevPos()
+    print("Diff: "..(self.x - self.prevX))
+    self.prevX = self.x
+    self.prevY = self.y
+end
+
+function Player:updateRotate(dt)
+    local rotateDecrease = 4
+    self.rotateMax = self.rotateMax + (self.x - self.prevX)
+
+    self.rotate = self.rotate + self.rotateMax * dt 
+    --bring back down
+    flux.to(self, 0.2, {rotateMax = 0 })
+
+    print(self.rotate)
+
+    local maxRotate = 90
+    if self.rotate > math.rad(maxRotate) then
+        self.rotate = math.rad(maxRotate)
+    end
+
+    local minRotate = -45
+    if self.rotate < math.rad(minRotate) then
+        self.rotate = math.rad(minRotate)
+    end
+    --
+end
+
+
 function Player:update(dt)
+    self:updateRotate(dt)
+    self:updatePrevPos()
+
+
+    flux.to(self, dt, { rotate = 0})
 
     --subtract invicbility
     if self.invicbility >= 0 then
@@ -99,9 +142,15 @@ function Player:update(dt)
             if item:is(Enemy) then
                 if (self.x > item.x and self.x < item.x + item.width) and (self.y > item.y and self.y < item.y + item.height) then
                     if self.leftmbpressed then
-                        item:TakeDamage(self.baseDamage)
+                        item:TakeDamage(self.baseDamage, self.aggroAdd)
+                        local chance = love.math.random(0, 2)
+                        if chance == 1 then
+                            self.rotateMax = self.rotateMax + 90/2
+                        else
+                            self.rotateMax = self.rotateMax - 45/2
+                        end
                         local spark = sparklePart()
-                        table.insert(partTable ,partStation(self.x, self.y, spark.part, 6))
+                        table.insert(partTable ,partStation(self.x, self.y, spark.part, 1))
 
                     end
                 end
@@ -128,21 +177,21 @@ function Player:update(dt)
 
     self.world:move(self, self.x, self.y, filter)
 
-
-
-
     --reset button clicked
     self.leftmbpressed = false
 end
+
+
 
 function Player:draw()
     if self.state == 1 then
         local x,y,w,h = self.world:getRect(self)
         love.graphics.setColor(0,1,0)
-        love.graphics.rectangle('fill', x, y, w, h)
+       -- love.graphics.rectangle('fill', x, y, w, h)
         love.graphics.setColor(1,1,1)
 
-        love.graphics.draw(self.image, self.x, self.y, 0, 1, 1, 0, -0)
+        --draw image
+        love.graphics.draw(self.image, self.x + 4, self.y + 4, self.rotate, 1, 1, 4, 4)
     end
 
 end
