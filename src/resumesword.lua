@@ -1,10 +1,12 @@
 local entity = require 'src.entity'
 local world = require 'world'
-
+local asset = require 'assets'
+local entities = require 'roomEntities'
 Resumesword = entity:extend()
 
 
 function Resumesword:new(x, y, tx, ty)
+table.insert(entities, self)
 
 self.states = {1, 2}
 self.state = self.states[1]
@@ -15,7 +17,7 @@ self.direction = math.atan2(ty - y, tx - x)
  self.x, self.y = x, y
  self.ix, self.iy = x, y
  self.tx, self.ty = tx, ty
- self.image = love.graphics.newImage('/img/idlesword.png/')
+ self.image = asset.images.sword_resume
  self.imageAngle = 0;
  self.speed = 40
 

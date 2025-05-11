@@ -8,7 +8,6 @@ local roomy = require 'lib.roomy'
 love.hasDeprecationOutput(false)
 local world = require 'world'
 local assets = require 'assets'
-local Player = require 'src.player'
 local Enemy = require 'src.enemy.enemy'
 
 local game = require 'gameStats'
@@ -32,6 +31,10 @@ local gameBoxStartY = 20
 local gameBoxHeight = 230
 
 local partTable = require 'particletable'
+local room = require 'src.room'
+
+local gameHud = require 'gameplayhud'
+local entities = require 'roomEntities'
 
 local mx, my
 
@@ -48,10 +51,8 @@ local mx, my
 --turn off mouse cursor (which will have a a sprite drawn at it instead
     love.mouse.setVisible(false) -- set cursor to false please
 
-
 local player = game.player
-
-local listOfEnemies = {}
+table.insert(entities, player)
 
 function InstanceCreate(x, y, obj)
     local objectToSpawn = 'src.'..tostring(obj)
@@ -69,12 +70,9 @@ function InstanceCreate(x, y, obj)
 
 function love.load()
 
-
     --TITLE SCREEN
     rManager:hook()
     rManager:enter(state.title)
-
-
 
 end
 
@@ -87,8 +85,23 @@ function love.mousepressed(x, y, button, istouch)
 function love.update(dt)
     flux.update(dt)
 
-  
+    --update particle table
+    local partTab = partTable
+    for i = 1, #partTab do
+        if i <= #partTable then
+        partTab[i]:update(dt)
+        end
+    end
+
 end
+
+function love.draw()
+
+
+    maxScaleX = love.graphics.getWidth() / canvas:getWidth()
+    maxScaleY = love.graphics.getHeight() / canvas:getHeight()
+    scale = math.min(maxScaleX, maxScaleY)
+ end
 
 function love.keypressed(key, scancode, isrepeat)
     if key == "f4" then
@@ -136,15 +149,14 @@ function love.keypressed(key, scancode, isrepeat)
 
 
 
+
 --GAMEPLAY
  state.gameplay = {}
 
  function state.gameplay:enter(previous, ...)
      -- set up the level
          --add enemies to list
-    table.insert(listOfEnemies, Enemy(gameBoxWidth*0.5, gameBoxHeight* 0.2))
-    table.insert(listOfEnemies, Enemy(gameBoxWidth*0.3, gameBoxHeight* 0.75))
-    table.insert(listOfEnemies, Enemy(gameBoxWidth*0.8, gameBoxHeight* 0.5))
+    room:SetRoomEntities(1)
  end
  
  function state.gameplay:update(dt)
@@ -175,28 +187,33 @@ function love.keypressed(key, scancode, isrepeat)
     end
     debugChart:AddToChart("insidebox: "..tostring(player.insideBox))
 
+
     local worldItems, worldLen = world:getItems()
     for i = 1, worldLen do
         local item = worldItems[i]
-        if player.resumesword == nil then
-        item:update(dt)
-        end
-        if player.resumesword ~= nil then
-            if item:is(Player) then
+
+    end
+
+    for i = 1, #entities do
+        
+        if i <= #entities then
+            local item = entities[i]
+            if player.resumesword == nil then
                 item:update(dt)
             end
-            if item:is(Resumesword) then
+            if player.resumesword ~= nil then
+                if item:is(Player) then
+                    item:update(dt)
+                end
+                if item:is(Resumesword) then
                 item:update(dt)
+                end
             end
         end
     end
-    --update particle table
-    local partTab = partTable
-    for i = 1, #partTab do
-        if i <= #partTable then
-        partTab[i]:update(dt)
-        end
-    end
+
+    room:update(dt)
+    
     --Update player
     player.x = mx - player.mOffX/2
     player.y = my - player.mOffY/2
@@ -223,6 +240,8 @@ function love.keypressed(key, scancode, isrepeat)
     love.graphics.rectangle('fill', 0, 0, gameWidth, gameHeight)
     love.graphics.setColor(1,1,1)
 
+    gameHud:draw()
+
     love.graphics.print("Center", gameWidth/2, gameHeight/2)
     if player.state ~= 2 then
 
@@ -241,6 +260,11 @@ function love.keypressed(key, scancode, isrepeat)
         item:draw()
     end
 
+    if room:checkWin() == true then
+        love.graphics.print("YOU WIN", 200, 200)
+    end
+
+    --Draw particles
     local partTab = partTable
     for i = 1, #partTab do
         partTab[i]:draw()
@@ -248,13 +272,6 @@ function love.keypressed(key, scancode, isrepeat)
 
     --return canvas to normal
     love.graphics.setCanvas()
-
-    --Canvas scaling
-    maxScaleX = love.graphics.getWidth() / canvas:getWidth()
-    maxScaleY = love.graphics.getHeight() / canvas:getHeight()
-    scale = math.min(maxScaleX, maxScaleY)
-    debugChart:AddToChart(tostring(scale))
-
 
     love.graphics.draw(canvas, love.graphics.getWidth() / 2, love.graphics.getHeight() / 2, 0, scale, scale, canvas:getWidth() / 2, canvas:getHeight() / 2)
  end

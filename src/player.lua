@@ -5,6 +5,7 @@ local Resumesword = require 'src.resumesword'
 local partStation = require 'src.particlestation'
 local partTable = require 'particletable'
 local sparklePart = require 'src.part.sparklepart'
+local entities = require 'roomEntities'
 
 local chart = require 'src.debugchart'
 
@@ -34,7 +35,7 @@ self.boxX = 0
 self.boxY = 0
 
 --damage stats
-self.baseDamage = 1
+self.baseDamage = 2
 self.aggroAdd = 3
 
 --hp
@@ -48,6 +49,8 @@ self.rotateMax = 0
 
 self.prevX = self.x
 self.prevY = self.y
+
+self.coins = 0
 
 
 
@@ -64,7 +67,6 @@ end
 
 local filter = function(item, other)
     if item:is(Bullet) then
-        print("RETURNING NIL")
         return 'cross'
     end
 
@@ -74,7 +76,6 @@ local filter = function(item, other)
 end
 
 function Player:updatePrevPos()
-    print("Diff: "..(self.x - self.prevX))
     self.prevX = self.x
     self.prevY = self.y
 end
@@ -86,8 +87,6 @@ function Player:updateRotate(dt)
     self.rotate = self.rotate + self.rotateMax * dt 
     --bring back down
     flux.to(self, 0.2, {rotateMax = 0 })
-
-    print(self.rotate)
 
     local maxRotate = 90
     if self.rotate > math.rad(maxRotate) then
@@ -139,7 +138,7 @@ function Player:update(dt)
 
         for i = 1, len do
             local item = items[i]
-            if item:is(Enemy) then
+            if item:is(Enemy) and item.isPlaying == true then
                 if (self.x > item.x and self.x < item.x + item.width) and (self.y > item.y and self.y < item.y + item.height) then
                     if self.leftmbpressed then
                         item:TakeDamage(self.baseDamage, self.aggroAdd)
@@ -151,9 +150,11 @@ function Player:update(dt)
                         end
                         local spark = sparklePart()
                         table.insert(partTable ,partStation(self.x, self.y, spark.part, 1))
-
                     end
                 end
+            end
+            if item:is(coinDrop) then
+                item:collect()
             end
         end
 

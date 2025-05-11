@@ -1,4 +1,4 @@
-
+local entities = require('roomEntities')
 Entity = Object:extend()
 
 function Entity:new(x, y)
@@ -17,7 +17,14 @@ function Entity:draw()
 end
 
 function Entity:Destroy()
-self.world:remove(self)
+    require 'world':remove(self)
+    for i = 1, #entities do
+        local item = entities[i]
+
+        if item == self then
+            table.remove(entities, i)
+        end
+    end
 end
 
 function Entity:getCenter()

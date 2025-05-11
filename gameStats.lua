@@ -1,6 +1,10 @@
+local Player = require('src.player')
 local game = {
-    Player = require('src.player'),
+
     player = Player(),
+
+
+    roomEntities = {}
 
 
 }

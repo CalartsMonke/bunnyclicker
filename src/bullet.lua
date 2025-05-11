@@ -19,6 +19,7 @@ function Bullet:new(x, y)
     self.states = {0, 1, 2}
     self.speed = 200
 
+    table.insert(require('roomEntities'), self)
     self.world:add(self, self.x, self.y, self.width, self.height)
 
 
@@ -42,12 +43,10 @@ end
 
 local filter = function(item, other)
     if item:is(Bullet) then
-        print("RETURNING NIL")
         return 'cross'
     end
 
     if item:is(Player) then
-        print('RETURNING CROSS')
         return 'cross'
     end
 end
@@ -56,10 +55,6 @@ function Bullet:update(dt)
     local tx, ty = game.player.x, game.player.y
 
     if self.bulletTimer <= 0 then
-
-        if self:is(Bullet) then
-            print("I AM A BULLET")
-        end
 
 
         local sx, sy = self:getCenter()
@@ -80,7 +75,6 @@ function Bullet:update(dt)
                 if col.other.invicbility <= 0 then
                     col.other:TakeDamage(1)
                 end
-                print("PLAYER TOOK DAMAGE")
             end
         end
 
