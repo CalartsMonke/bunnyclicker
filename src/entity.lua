@@ -8,6 +8,17 @@ function Entity:new(x, y)
     self.height = h
 end
 
+function Entity:addToGame(image, x, y)
+    self.image = image
+    self.x = x
+    self.y = y
+    self.width = self.image:getWidth()
+    self.height = self.image:getHeight()
+    self.world = require('world')
+
+    self.world:add(self, self.x, self.y, self.width, self.height)
+end
+
 function Entity:update()
 
 end

@@ -31,7 +31,9 @@ local gameBoxStartY = 20
 local gameBoxHeight = 230
 
 local partTable = require 'particletable'
-local room = require 'src.room'
+
+local dungeon = require 'src.dungeon'
+local dungeon = dungeon()
 
 local gameHud = require 'gameplayhud'
 local entities = require 'roomEntities'
@@ -120,6 +122,9 @@ function love.keypressed(key, scancode, isrepeat)
         local state = not love.mouse.isVisible()   -- the opposite of whatever it currently is
         love.mouse.setVisible(state)
      end
+
+     --DUNGEON FUNCTIONS
+     dungeon:keypressed(key, scancode, isrepeat)
  end
 
  --TITLE SCREEN
@@ -147,16 +152,12 @@ function love.keypressed(key, scancode, isrepeat)
     end
  end
 
-
-
-
 --GAMEPLAY
  state.gameplay = {}
 
  function state.gameplay:enter(previous, ...)
      -- set up the level
          --add enemies to list
-    room:SetRoomEntities(1)
  end
  
  function state.gameplay:update(dt)
@@ -194,25 +195,9 @@ function love.keypressed(key, scancode, isrepeat)
 
     end
 
-    for i = 1, #entities do
-        
-        if i <= #entities then
-            local item = entities[i]
-            if player.resumesword == nil then
-                item:update(dt)
-            end
-            if player.resumesword ~= nil then
-                if item:is(Player) then
-                    item:update(dt)
-                end
-                if item:is(Resumesword) then
-                item:update(dt)
-                end
-            end
-        end
-    end
+    dungeon:update(dt)
 
-    room:update(dt)
+    
     
     --Update player
     player.x = mx - player.mOffX/2
@@ -230,40 +215,22 @@ function love.keypressed(key, scancode, isrepeat)
  end
  
  function state.gameplay:draw()
-     -- draw the level
+   
+    --ROOM DRAWING CODE PLACEHOLDER
+
+      -- draw the level
       --init canvas
-    love.graphics.setCanvas(canvas)
-    love.graphics.clear()
-
-    --draw a bg
-    love.graphics.setColor(85/255, 65/255, 102/255)
-    love.graphics.rectangle('fill', 0, 0, gameWidth, gameHeight)
-    love.graphics.setColor(1,1,1)
-
+      love.graphics.setCanvas(canvas)
+      love.graphics.clear()
+  
+  
+      --draw debug chart
+     -- debugChart:DrawDebugMessage(10, 10, 0, 16)
+  
+    dungeon:draw()
     gameHud:draw()
 
-    love.graphics.print("Center", gameWidth/2, gameHeight/2)
-    if player.state ~= 2 then
-
-    end
-    --Draw debug rectangle box
-    love.graphics.rectangle('line', gameBoxStart, gameBoxStartY, gameBoxWidth, gameBoxHeight)
-
-
-    --draw debug chart
-    debugChart:DrawDebugMessage(10, 10, 0, 16)
-
-    --Draw items im too lazy to sort rn
-    local worldItems, worldLen = world:getItems()
-    for i = 1, worldLen do
-        local item = worldItems[i]
-        item:draw()
-    end
-
-    if room:checkWin() == true then
-        love.graphics.print("YOU WIN", 200, 200)
-    end
-
+    print(#entities)
     --Draw particles
     local partTab = partTable
     for i = 1, #partTab do

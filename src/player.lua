@@ -35,7 +35,7 @@ self.boxX = 0
 self.boxY = 0
 
 --damage stats
-self.baseDamage = 2
+self.baseDamage = 20
 self.aggroAdd = 3
 
 --hp
@@ -153,7 +153,7 @@ function Player:update(dt)
                     end
                 end
             end
-            if item:is(coinDrop) then
+            if item:is(coinDrop) or item:is(bagDrop) then
                 item:collect()
             end
         end
@@ -188,11 +188,11 @@ function Player:draw()
     if self.state == 1 then
         local x,y,w,h = self.world:getRect(self)
         love.graphics.setColor(0,1,0)
-       -- love.graphics.rectangle('fill', x, y, w, h)
+       love.graphics.rectangle('line', x, y, w, h)
         love.graphics.setColor(1,1,1)
 
         --draw image
-        love.graphics.draw(self.image, self.x + 4, self.y + 4, self.rotate, 1, 1, 4, 4)
+        love.graphics.draw(self.image, self.x + 4, self.y + 4, self.rotate, 1, 1, 8, 8)
     end
 
 end

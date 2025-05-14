@@ -3,6 +3,9 @@ local game = {
 
     player = Player(),
 
+    gameWidth = 640,
+    gameHeight = 360,
+
 
     roomEntities = {}
 
