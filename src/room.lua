@@ -1,23 +1,24 @@
 local entities = require('roomEntities')
 local object = require('lib.classic')
-local bagDrop = require('src.bagDrop')
-local RoomLevel = object:extend()
+local bagDrop = require 'src.collectible.bagDrop'
 
 
 
+
+RoomLevel = object:extend()
 function RoomLevel:new(roomID)
     self.clearWait = 0
-    self.prizeItem = nil
-    self.parentDungeon = nil
-    self.isCleared = false
+    self.prizeClearX = love.math.random(100, 200)
+    self.prizeClearY = love.math.random(100, 200)
+    local BagDrop = bagDrop(self.prizeClearX, self.prizeClearY)
+    self.prizeItem = BagDrop
+    self.prizeItem.parentRoom = self
+
     self.spawnTimeDelay = 0
     self.activeEnemyCount = 0
     self.entityList = {}
     
     self:SetRoomEntities(roomID)
-
-
- 
 end
 
 
@@ -36,7 +37,6 @@ function RoomLevel:SetRoomEntities(currentRoom)
             e1(330 , 200),
             e1(115 * 2, 125),
             e1(125 * 2, 175),
-            e1(150 * 2, 150),
             e1(200 * 2, 200),
 
         }
@@ -101,15 +101,24 @@ function RoomLevel:update(dt)
 
     if self.isCleared == true then
         self.clearWait = self.clearWait + dt
+
+
+    end
+    if self.prizeItem ~= nil then
+        if self.clearWait >= 0.6 and self.prizeItem.isActive == false then
+            self.prizeItem.isActive = true
+            table.insert(entities, self.prizeItem)
+            print("I LOVE CHILDREN I LOVE CHILDREN I LOVE CHILDREN")
+
+        end
     end
 
-    if self.clearWait >= 1 and self.reward == nil then
-        self.reward = bagDrop(200, 200)
-        self.reward.parentRoom = self
-    end
 end
 
 function RoomLevel:EndLevel()
+    self.prizeItem.isActive = false
+    self.prizeItem:Destroy()
+    self.prizeItem = nil
     self:clearEntities()
     self.parentDungeon:returnToRoomSelect()
 end
@@ -127,15 +136,25 @@ function RoomLevel:clearEntities()
 
 end
 
+function RoomLevel:keypressed()
+
+end
+
 
 function RoomLevel:draw()
-    print("THIS IS WORKING")
 
       --Draw items im too lazy to sort rn
       local worldItems, worldLen = world:getItems()
       for i = 1, worldLen do
           local item = worldItems[i]
           item:draw()
+      end
+
+      if self.prizeItem.isActive then
+        love.graphics.print("THE ITEM IS ACTIVE", 200, 100)
+      end
+      if self.prizeItem.isActive == false then
+        love.graphics.print("THE ITEM IS NOT ACTIVE AT ALL", 200, 100)
       end
 
 end

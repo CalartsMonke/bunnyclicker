@@ -9,6 +9,9 @@ local entities = require 'roomEntities'
 
 local chart = require 'src.debugchart'
 
+--TEMP
+local Gun = require 'src.items.assaultgun'
+
 Player = Entity:extend()
 
 function Player:new()
@@ -34,6 +37,9 @@ self.resumesword.state = 2
 self.boxX = 0
 self.boxY = 0
 
+--ITEMS
+self.activeItems = {Gun()}
+
 --damage stats
 self.baseDamage = 20
 self.aggroAdd = 3
@@ -52,6 +58,7 @@ self.prevY = self.y
 
 self.coins = 0
 
+self.hasBossKey = false
 
 
 self.leftmbpressed = false
@@ -72,6 +79,18 @@ local filter = function(item, other)
 
     if item:is(Player) then
         return nil
+    end
+end
+
+function Player:releaseSword()
+    self.resumesword = Resumesword(self.x, self.y, self.boxX, self.boxY)
+    self.boxX = 0
+    self.boxY = 0
+end
+
+function Player:keypressed(key, scancode, isrepeat)
+    if key == 'z' then
+        self.activeItems[1]:Use()
     end
 end
 
@@ -100,10 +119,23 @@ function Player:updateRotate(dt)
     --
 end
 
+function Player:itemsUpdate(dt)
+    for i = 1, #self.activeItems, 1 do
+        local item = self.activeItems[i]
+        item:update(dt)
+
+    end
+end
+
 
 function Player:update(dt)
     self:updateRotate(dt)
     self:updatePrevPos()
+    self:itemsUpdate(dt)
+
+    if self.currentHp > self.maxHp then
+        self.currentHp = self.maxHp
+    end
 
 
     flux.to(self, dt, { rotate = 0})
@@ -153,16 +185,26 @@ function Player:update(dt)
                     end
                 end
             end
-            if item:is(coinDrop) or item:is(bagDrop) then
-                item:collect()
+            if (self.x > item.x and self.x < item.x + item.width) and (self.y > item.y and self.y < item.y + item.height) then
+                if item:is(Collectible) then
+                    if item.state == item.states[1] then
+                        if item.isActive == true or item.isActive == nil then
+                            item:collect()
+                        end
+                    end
+                end
+                if item:is(shopItem) then
+                    item.displayAlpha = 3
+
+                    if self.leftmbpressed then
+                        item:buy()
+                    end
+                end
             end
         end
-
+        
     elseif self.insideBox == false and (self.boxX > 0 or self.boxY > 0) then
-
-        self.resumesword = Resumesword(self.x, self.y, self.boxX, self.boxY)
-        self.boxX = 0
-        self.boxY = 0
+        self:releaseSword()
     end
 
     local sword = self.resumesword

@@ -17,9 +17,13 @@ function Enemy:new(x, y)
     DEAD = 3,
  }
 
-    self.hp = 30
+    self.parentRoom = nil
+
+    self.hpMax = 30
+    self.hp = self.hpMax
     self.state = self.STATES.ACTIVE
     self.isPlaying = false
+    self.isBoss = false
 
     self.aggro = 0
     self.aggroDecrease = 2
@@ -40,6 +44,22 @@ function Enemy:TakeDamage(damage, aggrotoadd)
         
         --increase aggro
         self.aggro = self.aggro + (aggrotoadd * self.aggroMult)
+    end
+end
+
+--Do actions based on death and enemy state
+function Enemy:Die()
+    if self.isBoss == true then
+        self.parentRoom:exit()
+    end
+
+    if self.isBoss == false then
+        local coinDrop = require 'src.collectible.coinDrop'
+        local heartDrop = require 'src.collectible.heartDrop'
+        local Coin = coinDrop(self.x, self.y)
+        --local Heart = heartDrop(self.x, self.y)
+        self.state = self.STATES.DEAD
+        self:Destroy()
     end
 end
 

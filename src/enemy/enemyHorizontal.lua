@@ -25,9 +25,7 @@ function enemyHorizontal:update(dt)
     if self.isPlaying == true then
 
         if self.hp <= 0 then
-            local coinDrop = require 'src.coinDrop'
-            local Coin = coinDrop(self.x, self.y)
-            self.state = self.STATES.DEAD
+            self:Die()
         end
 
 
@@ -46,10 +44,15 @@ end
 
 function enemyHorizontal:draw()
     if self.isPlaying == true then
-        love.graphics.draw(self.image, self.x, self.y, 0, 0.5, 0.5)
+        love.graphics.draw(self.image, self.x, self.y, 0, 1, 1)
         love.graphics.print(tostring(self.hp), self.x + 5, self.y - 18)
         love.graphics.print(self.bulletTimer, self.x + 5, self.y - 32)
         love.graphics.print(self.state, self.x + 20, self.y - 50)
+
+        local x,y,w,h = self.world:getRect(self)
+        love.graphics.setColor(0,1,0)
+       love.graphics.rectangle('line', x, y, w, h)
+        love.graphics.setColor(1,1,1)
     end
 end
 

@@ -1,9 +1,10 @@
 world = require 'world'
+local collectible = require ('src.collectible.collectible')
 local player = require 'gameStats'.player
 local hud = require 'gameplayhud'
 local entities = require 'roomEntities'
 
-coinDrop = Entity:extend()
+coinDrop = Collectible:extend()
 
 function coinDrop:new(x, y)
 
@@ -31,10 +32,6 @@ function coinDrop:new(x, y)
 
     table.insert(entities, self)
     world:add(self, self.x, self.y, self.frameWidth, self.frameHeight)
-end
-
-function coinDrop:collect()
-    self.state = self.states[2]
 end
 
 function coinDrop:update(dt)

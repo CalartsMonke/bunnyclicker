@@ -27,7 +27,16 @@ function Entity:draw()
 
 end
 
+function Entity:BossDefeat()
+    if self.isBoss == true then
+        --idk some dying code here that may spawn a item or end the level
+    end
+end
+
 function Entity:Destroy()
+    if self:is(bagDrop) then
+        print("DESTROYED COINBAG")
+    end
     require 'world':remove(self)
     for i = 1, #entities do
         local item = entities[i]

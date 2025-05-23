@@ -1,5 +1,6 @@
 Dungeon = Object:extend()
 local Room = require('src.room')
+local bossKey = require('src.collectible.keyBoss')
 
 local blueSquare = require('assets').images.blueRoomSquare
 
@@ -23,18 +24,46 @@ function Dungeon:new()
 
     self.activeRoom = 0 --index of room that is being played
     self.previewRoom = 1 --index of room to show when selecting room
+    self.currentRoom = nil
+
+    self.textAlpha = 0
 
     self:generateNew()
 end
 
+
 function Dungeon:generateNew()
-    for i = 1, 7 do
-    local newRoom = Room(1)
-    print(newRoom)
-    newRoom.parentDungeon = self
-    table.insert(self.rooms, newRoom)
+    local hasGivenKey = false
+    local maxNormalRooms = 7
+    local BossKey = bossKey
+    for i = 1, maxNormalRooms do
+        local newroom = Room
+        local newRoom = newroom(1)
+
+        local num = love.math.random(1, 3)
+        if num > 2 and hasGivenKey == false then
+            newRoom.prizeItem:Destroy()
+            newRoom.prizeItem = BossKey(200, 200)
+            hasGivenKey = true
+        end
+        if hasGivenKey == false and i == maxNormalRooms then
+            newRoom.prizeItem:Destroy()
+            newRoom.prizeItem = BossKey(200, 200)
+            hasGivenKey = true
+        end
+
+        newRoom.parentDungeon = self
+        table.insert(self.rooms, newRoom)
 
     end
+    local shopRoom = require('src.roomShop')
+    shopRoom.parentDungeon = self
+    table.insert(self.rooms, shopRoom())
+
+    local bossRoom = require('src.roomBoss')
+    local BossRoom = bossRoom
+    bossRoom.parentDungeon = self
+    table.insert(self.rooms, BossRoom())
 end
 
 function Dungeon:returnToRoomSelect()
@@ -68,6 +97,10 @@ function Dungeon:keypressed(key, scancode, isrepeat)
     if key == 'space' then
 
     end
+    if self.state == self.STATES.ACTIVE then
+    self.currentRoom:keypressed(key, scancode, isrepeat)
+    end
+
 end
 
 function Dungeon:confirmRoomChoice(dt)
@@ -78,28 +111,55 @@ function Dungeon:confirmRoomChoice(dt)
         self.confirm = 0
     end
 
-    if self.confirm > 1 then
+    if self.confirm > 0.6 then
+        local roomToEnter = self.rooms[self.previewRoom]
         if not self.rooms[self.previewRoom].isCleared then
-        self.activeRoom = self.previewRoom
-        self.state = self.STATES.ACTIVE
+            if roomToEnter:is(RoomBoss) then
+                if _G.player.hasBossKey == true then
+                    _G.player.hasBossKey = false
+                    self.activeRoom = self.previewRoom
+                    self.state = self.STATES.ACTIVE
+                    self.rooms[self.activeRoom]:enter()
+                else
+                    self.textAlpha = 1.5
+                end
+            end
+
+            if self.rooms[self.previewRoom]:is(RoomShop) then
+                self.activeRoom = self.previewRoom
+                self.state = self.STATES.ACTIVE
+                self.rooms[self.activeRoom]:enter()
+            end
+
+            if roomToEnter:is(Room) then
+            self.activeRoom = self.previewRoom
+            self.state = self.STATES.ACTIVE
+            end
         end
         self.confirm = 0
+
+
+
+
+
     end
 end
 
 function Dungeon:update(dt)
+    if self.state == self.STATES.ACTIVE then
+    self.currentRoom = self.rooms[self.activeRoom]
     --Confirm a room to enter
+    end
 
 
 
     if self.state == self.STATES.SELECTING then
         self:confirmRoomChoice(dt)
-        print("CURRENTLY SELECTING")
+        self.textAlpha = self.textAlpha - dt
     end
 
     if self.state == self.STATES.ACTIVE then
         self.rooms[self.activeRoom]:update(dt)
-        print("CURRENTLY ACTIVE")
     end
 
 
@@ -107,8 +167,21 @@ end
 
 function Dungeon:draw()
 
+    love.graphics.setColor(1, 1, 1, self.textAlpha)
+    love.graphics.print("YOU DON'T HAVE A BOSS KEY", 200, 250)
+    love.graphics.setColor(1, 1, 1, 1)
+
     if self.state == self.STATES.SELECTING then
         love.graphics.print("ROOM NAME: "..self.rooms[self.previewRoom].displayName, 200, 200)
+        local roomToEnter = self.rooms[self.previewRoom]
+        if roomToEnter.prizeItem ~= nil then
+            if roomToEnter.prizeItem:is(KeyBoss) then
+                love.graphics.print("BOSS KEY", 200, 300)
+            end
+            if roomToEnter.prizeItem:is(bagDrop) then
+                love.graphics.print("COIN BAG", 200, 300)
+            end
+        end
 
         for i=1, #self.rooms do
             local index = i
@@ -121,6 +194,7 @@ function Dungeon:draw()
             love.graphics.draw(blueSquare, 100 + i * 32, 100 + heightSep)
         end
 
+        --DEBUG
         love.graphics.print(self.previewRoom, 300, 100)
         love.graphics.print(self.activeRoom, 200, 100)
     end

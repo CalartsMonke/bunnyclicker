@@ -9,16 +9,28 @@ local assets =
         hudCoin = love.graphics.newImage('/img/hudCoin.png/'),
         coinSpin = love.graphics.newImage('/img/coinSpin.png/'),
         coinBag = love.graphics.newImage('/img/moneybag.png/'),
+        heartDrop = love.graphics.newImage('/img/heartDrop.png/'),
         enemy1 = love.graphics.newImage('/img/laenemy.png/'),
         enemy2 = love.graphics.newImage('/img/laenemy2.png/'),
+        assualtGun = love.graphics.newImage('/img/AssGun.png/'),
 
-        blueRoomSquare = love.graphics.newImage('/img/blueRoomSquare.png/')
+
+        bossKey = love.graphics.newImage('/img/bossKey.png/'),
+        keyIcon = love.graphics.newImage('/img/keyIcon.png/'),
+        keyIconDotted = love.graphics.newImage('/img/keyIconDotted.png/'),
+        blueRoomSquare = love.graphics.newImage('/img/blueRoomSquare.png/'),
 
     },
 
     sounds =
     {
 
+    },
+
+    music = 
+    {
+        boss1 = love.audio.newSource('/aud/eggmanfight.mp3/', 'stream'),
+        boss2 = love.audio.newSource('/aud/jojomusic.mp3/', 'stream'),
     },
 
 

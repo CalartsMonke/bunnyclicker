@@ -2,6 +2,8 @@ require 'love'
 love.graphics.setDefaultFilter("nearest", "nearest")
 Object = require 'lib.classic'
 
+
+
 flux = require 'lib.flux'
 local roomy = require 'lib.roomy'
 
@@ -11,6 +13,8 @@ local assets = require 'assets'
 local Enemy = require 'src.enemy.enemy'
 
 local game = require 'gameStats'
+_G.game = game
+
 
 local rManager = require 'lib.roomy'.new()
 
@@ -35,8 +39,14 @@ local partTable = require 'particletable'
 local dungeon = require 'src.dungeon'
 local dungeon = dungeon()
 
-local gameHud = require 'gameplayhud'
+
 local entities = require 'roomEntities'
+
+local player = game.player
+_G.player = player
+table.insert(entities, player)
+
+local gameHud = require 'gameplayhud'
 
 local mx, my
 
@@ -53,8 +63,7 @@ local mx, my
 --turn off mouse cursor (which will have a a sprite drawn at it instead
     love.mouse.setVisible(false) -- set cursor to false please
 
-local player = game.player
-table.insert(entities, player)
+
 
 function InstanceCreate(x, y, obj)
     local objectToSpawn = 'src.'..tostring(obj)
@@ -125,6 +134,8 @@ function love.keypressed(key, scancode, isrepeat)
 
      --DUNGEON FUNCTIONS
      dungeon:keypressed(key, scancode, isrepeat)
+
+     player:keypressed(key, scancode, isrepeat)
  end
 
  --TITLE SCREEN
@@ -230,7 +241,6 @@ function love.keypressed(key, scancode, isrepeat)
     dungeon:draw()
     gameHud:draw()
 
-    print(#entities)
     --Draw particles
     local partTab = partTable
     for i = 1, #partTab do

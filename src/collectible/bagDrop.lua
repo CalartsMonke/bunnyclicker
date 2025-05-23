@@ -2,14 +2,15 @@ local world = require 'world'
 local player = require 'gameStats'.player
 local hud = require 'gameplayhud'
 local entities = require 'roomEntities'
-local coinDrop = require 'src.coinDrop'
+local coinDrop = require 'src.collectible.coinDrop'
 local gameStats= require 'gameStats'
 
-bagDrop = Entity:extend()
+bagDrop = Collectible:extend()
 
 function bagDrop:new(x, y)
     self.parentRoom = nil
     self.image = require 'assets'.images.coinBag
+    self.isActive = false
 
     self:addToGame(self.image, x, y)
 
@@ -32,16 +33,21 @@ function bagDrop:new(x, y)
     self.states = {1, 2, 3, 4, 5}
     self.state = self.states[1]
 
-    table.insert(entities, self)
+
 end
 
 function bagDrop:collect()
+    if self.isActive == nil or self.isActive == true then
     self.state = self.states[2]
+    print("THIS ITEM WAS COLLECTED")
+    end
 end
 
-function bagDrop:update(dt)
-    self.spawnTime = self.spawnTime + dt
 
+function bagDrop:update(dt)
+if self.isActive == true then
+    require('world'):update(self, self.x, self.y)
+    self.spawnTime = self.spawnTime + dt
 
     if self.state == self.states[2] then
         self.currentTime = self.currentTime + dt
@@ -72,10 +78,18 @@ function bagDrop:update(dt)
         end
     end
 
+
+end
 end
 
 function bagDrop:draw()
+    if self.isActive == true then
     love.graphics.draw(self.image, self.x, self.y)
+    local x,y,w,h = self.world:getRect(self)
+    love.graphics.setColor(0,1,0)
+   love.graphics.rectangle('line', x, y, w, h)
+    love.graphics.setColor(1,1,1)
+    end
 end
 
 return bagDrop

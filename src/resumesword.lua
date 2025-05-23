@@ -28,7 +28,7 @@ self.direction = math.atan2(ty - y, tx - x)
  --drawing
  self.yEx = 0
 
- self.width, self.height = self.image:getWidth(), self.image:getHeight()
+ self.width, self.height = 24, 24
 
  self.world = world
 
@@ -70,8 +70,8 @@ function Resumesword:update(dt)
 
     elseif self.state == 2 then
         self.imageAngle = 0
-        self.xDrawOff = 0
-        self.yDrawOff = 0
+        self.xDrawOff = -4
+        self.yDrawOff = -4
     end
 end
 
@@ -91,6 +91,12 @@ function Resumesword:draw()
             love.graphics.setColor(1,1,1)
         end
     end
+
+    local x,y,w,h = self.world:getRect(self)
+    love.graphics.setColor(0,1,0)
+   love.graphics.rectangle('line', x, y, w, h)
+    love.graphics.setColor(1,1,1)
+
 end
 
 
