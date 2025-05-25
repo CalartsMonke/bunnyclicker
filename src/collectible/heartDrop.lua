@@ -9,6 +9,7 @@ heartDrop = Collectible:extend()
 function heartDrop:new(x, y)
     self.image = require('assets').images.heartDrop
     self:addToGame(self.image, x, y)
+    self.isActive = true
 
     self.travelTime = 0.2
     self.currentTime = 0
@@ -19,6 +20,13 @@ function heartDrop:new(x, y)
     table.insert(entities, self)
     self.states = {1, 2}
     self.state = self.states[1]
+end
+
+function heartDrop:collect()
+    if self.isActive == nil or self.isActive == true then
+    self.state = self.states[2]
+    print("THIS ITEM WAS COLLECTED")
+    end
 end
 
 function heartDrop:update(dt)

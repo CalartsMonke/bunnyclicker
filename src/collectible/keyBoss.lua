@@ -22,7 +22,6 @@ function KeyBoss:new(x, y, parent)
     self.width = 32
     self.height = 32
 
-    table.insert(entities, self)
     self.states = {1, 2}
     self.state = self.states[1]
 end
@@ -45,6 +44,13 @@ function KeyBoss:update(dt)
             flux.to(self, self.travelTime, {x = hud.heartIconPosX})
             flux.to(self, self.travelTime, {y = hud.heartIconPosY})
         end
+    end
+end
+
+function KeyBoss:collect()
+    if self.isActive == nil or self.isActive == true then
+    self.state = self.states[2]
+    print("THIS ITEM WAS COLLECTED")
     end
 end
 

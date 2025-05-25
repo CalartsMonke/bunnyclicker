@@ -14,11 +14,14 @@ local assets =
         enemy2 = love.graphics.newImage('/img/laenemy2.png/'),
         assualtGun = love.graphics.newImage('/img/AssGun.png/'),
 
-
+        slash1 = love.graphics.newImage('/img/slash1.png/'),
         bossKey = love.graphics.newImage('/img/bossKey.png/'),
         keyIcon = love.graphics.newImage('/img/keyIcon.png/'),
         keyIconDotted = love.graphics.newImage('/img/keyIconDotted.png/'),
         blueRoomSquare = love.graphics.newImage('/img/blueRoomSquare.png/'),
+        grayRoomSquare = love.graphics.newImage('/img/grayRoomSquare.png/'),
+        shopRoomSquare = love.graphics.newImage('/img/shopRoomSquare.png/'),
+        bossRoomSquare = love.graphics.newImage('/img/bossRoomSquare.png/'),
 
     },
 

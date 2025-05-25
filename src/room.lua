@@ -1,7 +1,7 @@
 local entities = require('roomEntities')
 local object = require('lib.classic')
-local bagDrop = require 'src.collectible.bagDrop'
-
+local bagdrop = require 'src.collectible.bagDrop'
+local debugChart = require('src.debugchart')
 
 
 
@@ -10,9 +10,11 @@ function RoomLevel:new(roomID)
     self.clearWait = 0
     self.prizeClearX = love.math.random(100, 200)
     self.prizeClearY = love.math.random(100, 200)
-    local BagDrop = bagDrop(self.prizeClearX, self.prizeClearY)
-    self.prizeItem = BagDrop
-    self.prizeItem.parentRoom = self
+    local bag = bagdrop(self.prizeClearX, self.prizeClearY, love.math.random(1, 3))
+    bag.parentRoom = self
+    bag.isActive = false
+    self.prizeItem = bag
+    self.isCleared = false
 
     self.spawnTimeDelay = 0
     self.activeEnemyCount = 0
@@ -82,6 +84,10 @@ function RoomLevel:update(dt)
                 item:update(dt)
                 end
             end
+            if item:is(BagDrop) then
+                local tempString = "COIN BAG AT SPOT "..i
+                debugChart:AddToChart(tempString)
+            end
         end
     end
 
@@ -101,15 +107,12 @@ function RoomLevel:update(dt)
 
     if self.isCleared == true then
         self.clearWait = self.clearWait + dt
-
-
     end
+
     if self.prizeItem ~= nil then
         if self.clearWait >= 0.6 and self.prizeItem.isActive == false then
             self.prizeItem.isActive = true
             table.insert(entities, self.prizeItem)
-            print("I LOVE CHILDREN I LOVE CHILDREN I LOVE CHILDREN")
-
         end
     end
 
@@ -117,19 +120,18 @@ end
 
 function RoomLevel:EndLevel()
     self.prizeItem.isActive = false
-    self.prizeItem:Destroy()
     self.prizeItem = nil
     self:clearEntities()
     self.parentDungeon:returnToRoomSelect()
 end
 
-local num = 0
+
 function RoomLevel:clearEntities()
 
 
     for i = #entities, 1, -1 do
         local item = entities[i]
-        if not item:is(Player) then
+        if not item:is(Player) or (not item:is(Collectible) and item == self.prizeItem) then
             item:Destroy()
         end
     end

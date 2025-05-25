@@ -1,12 +1,12 @@
-world = require 'world'
+local world = require 'world'
 local collectible = require ('src.collectible.collectible')
 local player = require 'gameStats'.player
 local hud = require 'gameplayhud'
 local entities = require 'roomEntities'
 
-coinDrop = Collectible:extend()
+CoinDrop = collectible:extend()
 
-function coinDrop:new(x, y)
+function CoinDrop:new(x, y)
 
     self.x = x
     self.y = y
@@ -15,6 +15,7 @@ function coinDrop:new(x, y)
     self.travelTime = 0.4
     self.currentTime = 0
     self.value = 1
+    self.isActive = true
 
     self.image = require 'assets'.images.coinSpin
     self.animFrames = {}
@@ -34,7 +35,14 @@ function coinDrop:new(x, y)
     world:add(self, self.x, self.y, self.frameWidth, self.frameHeight)
 end
 
-function coinDrop:update(dt)
+function CoinDrop:collect()
+    if self.isActive == nil or self.isActive == true then
+    self.state = self.states[2]
+    print("THIS ITEM WAS COLLECTED")
+    end
+end
+
+function CoinDrop:update(dt)
     if self.state == self.states[2] then
         self.currentTime = self.currentTime + dt
         if self.currentTime >= self.travelTime * 1.5 then
@@ -54,8 +62,8 @@ function coinDrop:update(dt)
 
 end
 
-function coinDrop:draw()
+function CoinDrop:draw()
     love.graphics.draw(self.image, self.animFrames[self.frameToDraw], self.x, self.y)
 end
 
-return coinDrop
+return CoinDrop

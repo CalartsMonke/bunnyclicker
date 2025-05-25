@@ -179,13 +179,6 @@ function love.keypressed(key, scancode, isrepeat)
     local mouseOffX = (screenX - scaledScreenX) / 2
     local mouseOffY = (screenY - scaledScreenY) / 2
 
-
-
-    debugChart:AddToChart(tostring(scaledScreenX))
-    debugChart:AddToChart(tostring(screenX))
-
-    debugChart:AddToChart(tostring(mouseOffX))
-    debugChart:AddToChart(tostring(mouseOffY))
     
     mx, my = (love.mouse.getX() / scale) + mouseOffX, (love.mouse.getY() / scale) + mouseOffY
 
@@ -197,7 +190,6 @@ function love.keypressed(key, scancode, isrepeat)
         boxcheck = 'YOU ARE NOT IN BOX'
         player.insideBox = false
     end
-    debugChart:AddToChart("insidebox: "..tostring(player.insideBox))
 
 
     local worldItems, worldLen = world:getItems()

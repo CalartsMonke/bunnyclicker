@@ -34,9 +34,6 @@ function Entity:BossDefeat()
 end
 
 function Entity:Destroy()
-    if self:is(bagDrop) then
-        print("DESTROYED COINBAG")
-    end
     require 'world':remove(self)
     for i = 1, #entities do
         local item = entities[i]

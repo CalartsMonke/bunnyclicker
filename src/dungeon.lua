@@ -44,11 +44,13 @@ function Dungeon:generateNew()
         if num > 2 and hasGivenKey == false then
             newRoom.prizeItem:Destroy()
             newRoom.prizeItem = BossKey(200, 200)
+            newRoom.prizeItem.parentRoom = newRoom
             hasGivenKey = true
         end
         if hasGivenKey == false and i == maxNormalRooms then
             newRoom.prizeItem:Destroy()
             newRoom.prizeItem = BossKey(200, 200)
+            newRoom.prizeItem.parentRoom = newRoom
             hasGivenKey = true
         end
 
@@ -178,20 +180,33 @@ function Dungeon:draw()
             if roomToEnter.prizeItem:is(KeyBoss) then
                 love.graphics.print("BOSS KEY", 200, 300)
             end
-            if roomToEnter.prizeItem:is(bagDrop) then
+            if roomToEnter.prizeItem:is(BagDrop) then
                 love.graphics.print("COIN BAG", 200, 300)
             end
         end
-
+        local imageToDraw = blueSquare
         for i=1, #self.rooms do
             local index = i
             local heightSep = 0
+            local roomToDraw = self.rooms[i]
+            if roomToDraw:is(Room) and roomToDraw.isCleared == true then
+                imageToDraw = require('assets').images.grayRoomSquare
+            end
+            if roomToDraw:is(Room) and roomToDraw.isCleared == false then
+                imageToDraw = require('assets').images.blueRoomSquare
+            end
+            if roomToDraw:is(RoomShop) then
+                imageToDraw = require('assets').images.shopRoomSquare
+            end
+            if roomToDraw:is(RoomBoss) then
+                imageToDraw = require('assets').images.bossRoomSquare
+            end
 
             if index == self.previewRoom then
                 heightSep = -8
             end
 
-            love.graphics.draw(blueSquare, 100 + i * 32, 100 + heightSep)
+            love.graphics.draw(imageToDraw, 100 + i * 32, 100 + heightSep)
         end
 
         --DEBUG

@@ -5,9 +5,9 @@ local entities = require 'roomEntities'
 local coinDrop = require 'src.collectible.coinDrop'
 local gameStats= require 'gameStats'
 
-bagDrop = Collectible:extend()
+BagDrop = Collectible:extend()
 
-function bagDrop:new(x, y)
+function BagDrop:new(x, y, amountToSpawn)
     self.parentRoom = nil
     self.image = require 'assets'.images.coinBag
     self.isActive = false
@@ -16,10 +16,12 @@ function bagDrop:new(x, y)
 
     self.travelTime = 0.4
     self.currentTime = 0
-    self.coinSpawnDelay = 0.4
+    self.coinSpawnDelay = 0.2
     self.spawnStartDelay = 0.3
     self.spawnEndDelay = 1
     self.spawnTime = 0
+    self.coinsToSpawn = amountToSpawn or 3
+    self.coinsSpawned = 0
     self.coins = {
         coinDrop(999, 999),
         coinDrop(999, 999),
@@ -28,25 +30,24 @@ function bagDrop:new(x, y)
         coinDrop(999, 999)
     }
 
-
-
     self.states = {1, 2, 3, 4, 5}
     self.state = self.states[1]
 
 
 end
 
-function bagDrop:collect()
-    if self.isActive == nil or self.isActive == true then
+function BagDrop:collect()
+    if self.isActive == true then
     self.state = self.states[2]
-    print("THIS ITEM WAS COLLECTED")
+    print("THIS ITEM WAS COLLECTED AND IS A COIN BAG")
     end
 end
 
 
-function bagDrop:update(dt)
+function BagDrop:update(dt)
+
 if self.isActive == true then
-    require('world'):update(self, self.x, self.y)
+
     self.spawnTime = self.spawnTime + dt
 
     if self.state == self.states[2] then
@@ -66,14 +67,16 @@ if self.isActive == true then
     end
 
     if self.state == self.states[4] then
-        if self.spawnTime >= self.coinSpawnDelay and #self.coins > 0 then
-            local coin = table.remove(self.coins, 1)
+        if self.spawnTime >= self.coinSpawnDelay and self.coinsSpawned < self.coinsToSpawn then
+            local coin = coinDrop(self.x, self.y)
+            coin.isActive = true
             coin.x = self.x
             coin.y = self.y
             coin:collect()
             self.spawnTime = 0
+            self.coinsSpawned = self.coinsSpawned + 1
         end
-        if self.spawnTime >= self.spawnEndDelay and #self.coins <= 0 then
+        if self.spawnTime >= self.spawnEndDelay and self.coinsToSpawn <= self.coinsSpawned then
             self.parentRoom:EndLevel()
         end
     end
@@ -82,14 +85,14 @@ if self.isActive == true then
 end
 end
 
-function bagDrop:draw()
+function BagDrop:draw()
     if self.isActive == true then
     love.graphics.draw(self.image, self.x, self.y)
     local x,y,w,h = self.world:getRect(self)
     love.graphics.setColor(0,1,0)
-   love.graphics.rectangle('line', x, y, w, h)
+    love.graphics.rectangle('line', x, y, w, h)
     love.graphics.setColor(1,1,1)
     end
 end
 
-return bagDrop
+return BagDrop

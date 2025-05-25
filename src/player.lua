@@ -41,6 +41,7 @@ self.boxY = 0
 self.activeItems = {Gun()}
 
 --damage stats
+self.equippedWeapon = WeaponDagger()
 self.baseDamage = 20
 self.aggroAdd = 3
 
@@ -49,6 +50,9 @@ self.maxHp = 3
 self.currentHp = self.maxHp
 self.invicbilityMax = 1.5
 self.invicbility = self.invicbilityMax
+
+
+
 
 self.rotate = 0
 self.rotateMax = 0
@@ -188,7 +192,7 @@ function Player:update(dt)
             if (self.x > item.x and self.x < item.x + item.width) and (self.y > item.y and self.y < item.y + item.height) then
                 if item:is(Collectible) then
                     if item.state == item.states[1] then
-                        if item.isActive == true or item.isActive == nil then
+                        if item.isActive == true then
                             item:collect()
                         end
                     end
