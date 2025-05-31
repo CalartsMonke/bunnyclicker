@@ -16,7 +16,7 @@ function BagDrop:new(x, y, amountToSpawn)
 
     self.travelTime = 0.4
     self.currentTime = 0
-    self.coinSpawnDelay = 0.2
+    self.coinSpawnDelay = 0.7
     self.spawnStartDelay = 0.3
     self.spawnEndDelay = 1
     self.spawnTime = 0

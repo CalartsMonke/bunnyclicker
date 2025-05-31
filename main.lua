@@ -219,12 +219,14 @@ function love.keypressed(key, scancode, isrepeat)
  
  function state.gameplay:draw()
    
-    --ROOM DRAWING CODE PLACEHOLDER
 
+
+    --ROOM DRAWING CODE PLACEHOLDER
       -- draw the level
       --init canvas
       love.graphics.setCanvas(canvas)
       love.graphics.clear()
+      canvas:setFilter("nearest")
   
   
       --draw debug chart
@@ -242,5 +244,8 @@ function love.keypressed(key, scancode, isrepeat)
     --return canvas to normal
     love.graphics.setCanvas()
 
+
+    love.graphics.setBlendMode("alpha", "premultiplied")
     love.graphics.draw(canvas, love.graphics.getWidth() / 2, love.graphics.getHeight() / 2, 0, scale, scale, canvas:getWidth() / 2, canvas:getHeight() / 2)
+    love.graphics.setBlendMode("alpha")
  end

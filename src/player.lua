@@ -38,11 +38,15 @@ self.boxX = 0
 self.boxY = 0
 
 --ITEMS
-self.activeItems = {Gun()}
+self.activeItems = {
+    Gun(),
+    require 'src.items.brokenbottle'(),
+    require 'src.items.goldgun'()
+}
 
 --damage stats
-self.equippedWeapon = WeaponDagger()
-self.baseDamage = 20
+self.equippedWeapon = require('src.weapons.weapon_brokenBottle')()
+self.baseDamage = 1
 self.aggroAdd = 3
 
 --hp
@@ -93,8 +97,21 @@ function Player:releaseSword()
 end
 
 function Player:keypressed(key, scancode, isrepeat)
+    local items = self.activeItems
     if key == 'z' then
-        self.activeItems[1]:Use()
+        if items[1].Use ~= nil then
+            self.activeItems[1]:Use()
+        end
+    end
+    if key == 'x' then
+        if items[2].Use ~= nil then
+            self.activeItems[2]:Use()
+        end
+    end
+    if key == 'c' then
+        if items[3].Use ~= nil then
+        self.activeItems[3]:Use()
+        end
     end
 end
 
@@ -124,6 +141,11 @@ function Player:updateRotate(dt)
 end
 
 function Player:itemsUpdate(dt)
+    self.equippedWeapon:update(dt)
+    --transform into base item if uses are gone
+    if self.equippedWeapon.uses <= 0 then
+        self.equippedWeapon = require('src.weapons.weapon_dagger')()
+    end
     for i = 1, #self.activeItems, 1 do
         local item = self.activeItems[i]
         item:update(dt)
@@ -177,15 +199,9 @@ function Player:update(dt)
             if item:is(Enemy) and item.isPlaying == true then
                 if (self.x > item.x and self.x < item.x + item.width) and (self.y > item.y and self.y < item.y + item.height) then
                     if self.leftmbpressed then
-                        item:TakeDamage(self.baseDamage, self.aggroAdd)
-                        local chance = love.math.random(0, 2)
-                        if chance == 1 then
-                            self.rotateMax = self.rotateMax + 90/2
-                        else
-                            self.rotateMax = self.rotateMax - 45/2
-                        end
-                        local spark = sparklePart()
-                        table.insert(partTable ,partStation(self.x, self.y, spark.part, 1))
+                        self.equippedWeapon:use(self, item)
+
+
                     end
                 end
             end
@@ -208,7 +224,7 @@ function Player:update(dt)
         end
         
     elseif self.insideBox == false and (self.boxX > 0 or self.boxY > 0) then
-        self:releaseSword()
+        --self:releaseSword()
     end
 
     local sword = self.resumesword

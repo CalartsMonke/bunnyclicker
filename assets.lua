@@ -12,7 +12,10 @@ local assets =
         heartDrop = love.graphics.newImage('/img/heartDrop.png/'),
         enemy1 = love.graphics.newImage('/img/laenemy.png/'),
         enemy2 = love.graphics.newImage('/img/laenemy2.png/'),
+        dagger1 = love.graphics.newImage('/img/dagger1.png/'),
         assualtGun = love.graphics.newImage('/img/AssGun.png/'),
+        goldGun = love.graphics.newImage('/img/goldGun.png/'),
+        brokenBottle = love.graphics.newImage('/img/brokenbottleicon.png/'),
 
         slash1 = love.graphics.newImage('/img/slash1.png/'),
         bossKey = love.graphics.newImage('/img/bossKey.png/'),
@@ -27,6 +30,12 @@ local assets =
 
     sounds =
     {
+        bottlesmash1 = love.audio.newSource('/aud/bottlesmash1.mp3/', 'static'),
+        bottlesmash2 = love.audio.newSource('/aud/bottlesmash2.mp3/', 'static'),
+        gunshot1 = love.audio.newSource('/aud/gunshot1.mp3/', 'static'),
+        gunshot2 = love.audio.newSource('/aud/gunshot2.mp3/', 'static'),
+        slash1 = love.audio.newSource('/aud/slash1.mp3/', 'static'),
+        slash2 = love.audio.newSource('/aud/slash2.mp3/', 'static'),
 
     },
 
@@ -35,6 +44,12 @@ local assets =
         boss1 = love.audio.newSource('/aud/eggmanfight.mp3/', 'stream'),
         boss2 = love.audio.newSource('/aud/jojomusic.mp3/', 'stream'),
     },
+
+    fonts =
+    {
+        ns13 = love.graphics.newFont('/fonts/NotoSans-VariableFont_wdth,wght.ttf/', 13, 'mono'),
+        dd16 = love.graphics.newFont('/fonts/Dank-Depths.ttf/', 16, 'mono'),
+    }
 
 
 

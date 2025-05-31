@@ -56,7 +56,11 @@ function Enemy:Die()
     if self.isBoss == false then
         local coinDrop = require 'src.collectible.coinDrop'
         local heartDrop = require 'src.collectible.heartDrop'
+        local chance = love.math.random(0, 2)
+
+        if chance == 1 then
         local Coin = coinDrop(self.x, self.y)
+        end
         --local Heart = heartDrop(self.x, self.y)
         self.state = self.STATES.DEAD
         self:Destroy()
@@ -105,7 +109,38 @@ function Enemy:SpawnBulletHorizontal(target, num, distance, speed)
     local prevBullet = nil
     for i=1, num do
 
-        local bullet = Bullet( tx + distance , ty)
+        local bullet = require('src.bullet')( tx + distance , ty)
+        bullet.direction = math.rad(180)
+        if prevBullet ~= nil then
+        bullet.speed = prevBullet.speed * 0.8
+        end
+        prevBullet = bullet
+    end
+
+end
+
+--- Spawn a circle of bullets around the given object
+function Enemy:SpawnBulletWavyCircle(target, num, angleincrease, distance, wavyness, wavySpeed)
+    local angle = math.floor(love.math.random(0, 360))
+    for i=1, num do
+    local tx, ty = target.x, target.y
+    local bx, by = 0, 0
+
+
+    bx = tx + (math.cos(angle + (angleincrease * i)) * distance)
+    by = ty - (math.sin(angle + (angleincrease * i)) * distance)
+    local bullet = require 'src.bulletWavy'(bx, by, wavyness, wavySpeed)
+    end
+end
+
+--Spawn a line of horizontal bullets on the y axis of the given object
+function Enemy:SpawnBulletWavyHorizontal(target, num, distance, speed)
+    local tx = target.x
+    local ty = target.y
+    local prevBullet = nil
+    for i=1, num do
+
+        local bullet = require('src.bulletWavy')( tx + distance , ty, 3, 5)
         bullet.direction = math.rad(180)
         if prevBullet ~= nil then
         bullet.speed = prevBullet.speed * 0.8

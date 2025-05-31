@@ -1,5 +1,6 @@
 local player = require ('gameStats').player
 local game = require ('gameStats')
+local assets = require 'assets'
 local coinTextOffX = 40
 local coinTextOffY = 10
 local hpOffX = 20
@@ -9,6 +10,8 @@ local hpOffY = 40
 local gameplayHud = {
     heartIconPosX = 20,
     heartIconPosY = 300,
+    weaponIconPosX = 20,
+    weaponIconPosY = 60,
     coinIconPosX = 20,
     coinIconPosY = 20,
     keyIconPosX = 5,
@@ -16,7 +19,7 @@ local gameplayHud = {
 
     activeItemsPosX = game.gameWidth - 300,
     activeItemsPosY = game.gameHeight - 75,
-    activeItemsPosSep = 32,
+    activeItemsPosSep = 80,
 
     coinIconImage = require 'assets'.images.hudCoin,
     keyIconImage = require 'assets'.images.keyIcon,
@@ -43,13 +46,25 @@ function gameplayHud:draw()
     end
     love.graphics.setColor(1, 1, 1, 1)
 
-    love.graphics.draw(self.coinIconImage, self.coinIconPosX, self.coinIconPosY)
-    love.graphics.print(player.coins, self.coinIconPosX + coinTextOffX, self.coinIconPosY + coinTextOffY)
 
+    --Draw coins and number of coins
+    love.graphics.draw(self.coinIconImage, self.coinIconPosX, self.coinIconPosY)
+    love.graphics.setFont(require'assets'.fonts.dd16)
+    love.graphics.print(player.coins, math.floor(self.coinIconPosX + coinTextOffX), math.floor(self.coinIconPosY + coinTextOffY))
+    love.graphics.setFont(assets.fonts.ns13)
+
+
+    --Draw boss key
     if player.hasBossKey == true then
         love.graphics.draw(self.keyIconImage, self.keyIconPosX, self.keyIconPosY, 0, 2, 2)
     else
         love.graphics.draw(self.keyIconImageDotted, self.keyIconPosX, self.keyIconPosY, 0, 2, 2)
+    end
+
+    --Draw player weapon and text
+    local playerweapon = player.equippedWeapon
+    if playerweapon ~= nil then
+        love.graphics.draw(playerweapon.image, self.weaponIconPosX, self.weaponIconPosY)
     end
 
 
@@ -58,9 +73,11 @@ function gameplayHud:draw()
         local item = player.activeItems[i]
         
         love.graphics.draw(item.image, self.activeItemsPosX + (i - 1) * self.activeItemsPosSep, self.activeItemsPosY)
-        local number = math.ceil(item.reloadTimeMax - item.reloadTime)
+        local number = math.ceil(item.rechargeTimeMax - item.rechargeTime)
         if number > 0 then
-            love.graphics.print(number, 200, 250)
+            love.graphics.setFont(assets.fonts.dd16)
+            love.graphics.print(number, math.floor(350 + (i - 1) * 80), math.floor(270))
+            love.graphics.setFont(assets.fonts.ns13)
         end
     end
 end

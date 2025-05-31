@@ -37,7 +37,7 @@ function enemyHorizontal:update(dt)
         if self.bulletTimer <= 0 then
             self.bulletTimer = self.bulletTimer + self.bulletTimerMax + love.math.random(1, 30) * 0.10
 
-            self:SpawnBulletHorizontal(game.player, 4, 200, 100)
+            self:SpawnBulletHorizontal(game.player, 1, 200, 100, 3, 2)
         end
     end
 end
