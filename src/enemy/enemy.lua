@@ -9,6 +9,8 @@ Enemy = entity:extend()
 
 
 function Enemy:new(x, y)
+    self.x = x or 100
+    self.y = y or 100
 
     self.STATES =
  {

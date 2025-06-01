@@ -55,6 +55,7 @@ function enemyDasherBun:update(dt)
     self:updatePlayingState()
     if self.isPlaying == true then
         if self.state == self.STATES.IDLE then
+            world:update(self, self.x, self.y)
             self.dashTimer = self.dashTimer - dt
 
 

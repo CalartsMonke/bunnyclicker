@@ -1,12 +1,16 @@
+---@diagnostic disable: undefined-field
 local entities = require('roomEntities')
 local object = require('lib.classic')
 local bagdrop = require 'src.collectible.bagDrop'
 local debugChart = require('src.debugchart')
 
-
+local dungeon = 1
 
 RoomLevel = object:extend()
-function RoomLevel:new(roomID)
+function RoomLevel:new(roomID, parent)
+    self.parentDungeon = parent or nil
+    self.dungeon = parent
+    dungeon = parent
     self.clearWait = 0
     self.prizeClearX = love.math.random(100, 200)
     self.prizeClearY = love.math.random(100, 200)
@@ -34,17 +38,13 @@ function RoomLevel:SetRoomEntities(currentRoom)
         self.activeEnemyLimit = 3
         self.displayName = 'THIS IS FLIPPING EPIC'
  
-        self.entityList =
-        {
-            e1(150 * 2, 150),
-            e1(330 , 200),
-            e1(115 * 2, 125),
-            e2(130 * 2, 100),
-            e1(125 * 2, 175),
-            e1(200 * 2, 200),
-            e2(130 * 2, 100),
+        self.entityList = {}
+        dungeon:InstanceCreateOnCell(self, e1(), 1, 3)
+        dungeon:InstanceCreateOnCell(self, e2(), 4, 6)
+        dungeon:InstanceCreateOnCell(self, e1(), 12, 3)
+        dungeon:InstanceCreateOnCell(self, e2(), 9, 7)
+        dungeon:InstanceCreateOnCell(self, e1(), 5, 6)
 
-        }
     end
 
     if id == 2 then
@@ -153,13 +153,6 @@ function RoomLevel:draw()
       for i = 1, worldLen do
           local item = worldItems[i]
           item:draw()
-      end
-
-      if self.prizeItem.isActive then
-        love.graphics.print("THE ITEM IS ACTIVE", 200, 100)
-      end
-      if self.prizeItem.isActive == false then
-        love.graphics.print("THE ITEM IS NOT ACTIVE AT ALL", 200, 100)
       end
 
 end

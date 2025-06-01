@@ -12,6 +12,7 @@ function WeaponDagger:new()
     self.delayMax = 1 * 0.4
     self.uses = 99
     self.image = require 'assets'.images.dagger1
+    self.name = 'DAGGER'
     
     self.basic = true
 end

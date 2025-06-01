@@ -8,8 +8,8 @@ end
 
 function Entity:addToGame(image, x, y)
     self.image = image
-    self.x = x
-    self.y = y
+    self.x = x or 100
+    self.y = y or 100
     self.width = self.image:getWidth()
     self.height = self.image:getHeight()
     self.world = require('world')

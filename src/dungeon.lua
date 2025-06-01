@@ -2,11 +2,28 @@ Dungeon = Object:extend()
 local Room = require('src.room')
 local bossKey = require('src.collectible.keyBoss')
 
+local assets = require('assets')
+
 local blueSquare = require('assets').images.blueRoomSquare
+
+local NAMES = {
+    "BACK ALLEY",
+    "DRUG STREET",
+}
 
 function Dungeon:new()
 
     self.confirm = 0
+
+    self.cellWidth = 32
+    self.cellHeight = 32
+    self.cellsHorizontal = 14
+    self.cellsVertical = 8
+    self.cellStartX = self.cellWidth * 3
+    self.cellStartY = self.cellHeight
+
+    self.name = NAMES[math.floor(love.math.random(1, #NAMES))]
+    self.level = 1
 
     self.STATES =
  {
@@ -39,7 +56,7 @@ function Dungeon:generateNew()
     local BossKey = bossKey
     for i = 1, maxNormalRooms do
         local newroom = Room
-        local newRoom = newroom(1)
+        local newRoom = newroom(1, self)
 
         local num = love.math.random(1, 3)
         if num > 2 and hasGivenKey == false then
@@ -147,11 +164,6 @@ function Dungeon:confirmRoomChoice(dt)
             end
         end
         self.confirm = 0
-
-
-
-
-
     end
 end
 
@@ -169,7 +181,6 @@ function Dungeon:update(dt)
 
         for i = 1, #self.roomsDisplay do
            room = self.roomsDisplay[i]
-           print("ROOM"..i.." HEIGHT IS EQUAL TO "..room.height)
            
            if self.previewRoom == i then
                 if room.height < 8 then
@@ -206,6 +217,13 @@ function Dungeon:draw()
     love.graphics.setColor(1, 1, 1, 1)
 
     if self.state == self.STATES.SELECTING then
+        --DRAW BACKGROUND BASED ON CURRENT LEVEL
+        love.graphics.setColor(1, 1, 1, 0.6)
+        love.graphics.draw(assets.images.backgrounds.dungeon.backalley1, 0, 0)
+        love.graphics.setColor(1, 1, 1, 1)
+
+
+
         --love.graphics.print("ROOM NAME: "..self.rooms[self.previewRoom].displayName, 200, 200)
         local roomToEnter = self.rooms[self.previewRoom]
         if roomToEnter.prizeItem ~= nil then
@@ -216,6 +234,14 @@ function Dungeon:draw()
             --    love.graphics.print("COIN BAG", 200, 300)
             end
         end
+
+        love.graphics.setFont(require'assets'.fonts.dd16)
+        love.graphics.print(self.name, 460, 40)
+        love.graphics.print("LEVEL - "..self.level, 470, 10)
+        love.graphics.setFont(require'assets'.fonts.ns13)
+
+        
+
         local imageToDraw = blueSquare
         for i=1, #self.rooms do
             local index = i
@@ -246,10 +272,69 @@ function Dungeon:draw()
        -- love.graphics.print(self.activeRoom, 200, 100)
     end
 
+    
+    local function ScaleMousePosToScreen()
+        local scaledScreenX, scaledScreenY = love.graphics.getWidth() / _G.screenScale, love.graphics.getHeight() / _G.screenScale
+        local screenX, screenY = 640, 360
+        local mouseOffX = (screenX - scaledScreenX) / 2
+        local mouseOffY = (screenY - scaledScreenY) / 2
+    
+        return (love.mouse.getX() / _G.screenScale) + mouseOffX, (love.mouse.getY() / _G.screenScale) + mouseOffY
+    end
+
     if self.state == self.STATES.ACTIVE then
+                --DRAW BACKGROUND BASED ON CURRENT LEVEL
+                love.graphics.setColor(1, 1, 1, 0.6)
+                love.graphics.draw(assets.images.backgrounds.rooms.backalley.backalley1, 0, 0)
+                love.graphics.setColor(1, 1, 1, 1)
+
+                local csx, csy = self.cellStartX, self.cellStartY
+
+                --debug
+                local mx, my = _G.scaledMX, _G.scaledMY
+                local cx, cy = self:ConvertPositionToCell(mx, my)
+
+                love.graphics.setColor(1, 1, 1, 0.2)
+                love.graphics.circle('fill', cx + 16, cy + 16, 10)
+                for i = 1, 14 do
+                    love.graphics.line(csx + (i-1) * self.cellWidth, csy, csx + (i-1) * self.cellWidth, (self.cellHeight * self.cellsVertical) + self.cellStartY)
+                end
+                for  i = 1, 10 do
+                    love.graphics.line(csx, csy + (i-1) * self.cellHeight, self.cellStartX + self.cellsHorizontal * self.cellWidth , csy + (i-1) * self.cellHeight)
+                end
+                love.graphics.setColor(1, 1, 1, 1)
+
         self.rooms[self.activeRoom]:draw()
     end
 end
+
+function Dungeon:ConvertPositionToCell(x, y)
+    local cellwidth = 32
+    local cellheight = 32
+
+    local nx =  (math.floor((x / cellwidth)) * cellwidth) / _G.screenScale
+    local ny =  (math.floor((y / cellheight)) * cellheight) / _G.screenScale
+    print("CELLX "..nx / 32)
+    print("CELLY "..ny / 32)
+    return nx, ny
+end
+
+function Dungeon:InstanceCreateOnCell(list, instance, cx, cy)
+    local cxOff = 3
+    local cyOff = 1
+    local xOff = cxOff * 32
+    local yOff = cyOff * 32
+
+
+    instance.x = (cx * 32) + xOff
+    instance.y = (cy * 32) + yOff
+    local list = list
+    table.insert(list, instance)
+    print(instance.x)
+    print(instance.y)
+end
+
+
 
 
 return Dungeon

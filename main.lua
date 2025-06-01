@@ -59,6 +59,7 @@ local mx, my
     local maxScaleY 
     
     local scale = 1
+    _G.screenScale = scale
 
 --turn off mouse cursor (which will have a a sprite drawn at it instead
     love.mouse.setVisible(false) -- set cursor to false please
@@ -181,6 +182,8 @@ function love.keypressed(key, scancode, isrepeat)
 
     
     mx, my = (love.mouse.getX() / scale) + mouseOffX, (love.mouse.getY() / scale) + mouseOffY
+    _G.scaledMX = mx
+    _G.scaledMY = my
 
     local boxcheck
     if (mx > gameBoxStart and mx < gameBoxStart + gameBoxWidth) and (my > gameBoxStartY and my < gameBoxStartY + gameBoxHeight) then
@@ -188,7 +191,7 @@ function love.keypressed(key, scancode, isrepeat)
         player.insideBox = true
     else
         boxcheck = 'YOU ARE NOT IN BOX'
-        player.insideBox = false
+        player.insideBox = true
     end
 
 

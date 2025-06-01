@@ -26,6 +26,22 @@ local assets =
         shopRoomSquare = love.graphics.newImage('/img/shopRoomSquare.png/'),
         bossRoomSquare = love.graphics.newImage('/img/bossRoomSquare.png/'),
 
+        backgrounds = 
+        {
+            dungeon =
+            {
+                backalley1 = love.graphics.newImage('/img/backgrounds/dungeonbackdrops/backdrop_dungeon_backalley1.png'),
+            },
+
+            rooms = 
+            {
+                backalley =
+                {
+                    backalley1 = love.graphics.newImage('/img/backgrounds/backalleybackdrops/backdrop_room_backalley1.png/'),
+                },
+            },
+        },
+
         enemies =
         {
             dasherBun =
