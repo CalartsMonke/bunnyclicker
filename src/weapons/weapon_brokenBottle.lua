@@ -12,6 +12,7 @@ function WeaponBrokenBottle:new()
     self.delayMax = 1 * 0.4
     self.uses = 1
     self.image = require('assets').images.brokenBottle
+    self.name = "BROKEN BOTTLE"
 end
 
 function WeaponBrokenBottle:update(dt)

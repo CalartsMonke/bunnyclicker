@@ -12,6 +12,7 @@ function WeaponAssualtGun:new()
     self.delayMax = 0.05
     self.uses = 8
     self.image = require('assets').images.assualtGun
+        self.name = "ASSUALT GUN"
 
 end
 

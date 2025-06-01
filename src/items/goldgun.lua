@@ -18,7 +18,9 @@ end
 function GoldGun:update(dt)
 
     if self.state == self.STATES.INACTIVE and _G.player.resumesword == nil and not _G.player.equippedWeapon:is(WeaponGoldGun) then
-        self.rechargeTime = self.rechargeTime + dt
+        if self.rechargeTime <= self.rechargeTimeMax then
+            self.rechargeTime = self.rechargeTime + dt
+            end
     end
 
 end

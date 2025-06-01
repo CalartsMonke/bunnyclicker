@@ -29,6 +29,7 @@ function RoomLevel:SetRoomEntities(currentRoom)
     
     if id == 1 then
         local e1 = require 'src.enemy.enemyHorizontal'
+        local e2 = require 'src.enemy.dasherBun'
         self.spawnTimeDelayMax = 1
         self.activeEnemyLimit = 3
         self.displayName = 'THIS IS FLIPPING EPIC'
@@ -38,8 +39,10 @@ function RoomLevel:SetRoomEntities(currentRoom)
             e1(150 * 2, 150),
             e1(330 , 200),
             e1(115 * 2, 125),
+            e2(130 * 2, 100),
             e1(125 * 2, 175),
             e1(200 * 2, 200),
+            e2(130 * 2, 100),
 
         }
     end
@@ -167,7 +170,7 @@ function RoomLevel:getEnemyCount()
         local item = entities[i]
 
         if item:is(Enemy) then
-            if item.state == item.STATES.ACTIVE then
+            if item.state ~= item.STATES.DEAD then
              count = count + 1
             end
         end

@@ -16,6 +16,7 @@ function Dungeon:new()
  }
     self.state = self.STATES.SELECTING
     self.rooms = {}
+    self.roomsDisplay = {}
     self.roomlimit = 10
     self.roommin = 6
 
@@ -66,6 +67,13 @@ function Dungeon:generateNew()
     local BossRoom = bossRoom
     bossRoom.parentDungeon = self
     table.insert(self.rooms, BossRoom())
+
+
+    --DO ROOM HEIGHT TABLES
+    for i=1, #self.rooms do
+        local heightTable = {height = 0}
+        table.insert(self.roomsDisplay, heightTable)
+    end
 end
 
 function Dungeon:returnToRoomSelect()
@@ -158,6 +166,28 @@ function Dungeon:update(dt)
     if self.state == self.STATES.SELECTING then
         self:confirmRoomChoice(dt)
         self.textAlpha = self.textAlpha - dt
+
+        for i = 1, #self.roomsDisplay do
+           room = self.roomsDisplay[i]
+           print("ROOM"..i.." HEIGHT IS EQUAL TO "..room.height)
+           
+           if self.previewRoom == i then
+                if room.height < 8 then
+                    room.height = room.height + 2
+                end
+            else
+                room.height = room.height - 1
+            end
+
+            if room.height < 0 then
+                room.height = 0
+            end
+
+            if room.height > 8 then
+                room.height = 8
+            end
+
+        end
     end
 
     if self.state == self.STATES.ACTIVE then
@@ -170,18 +200,20 @@ end
 function Dungeon:draw()
 
     love.graphics.setColor(1, 1, 1, self.textAlpha)
-    love.graphics.print("YOU DON'T HAVE A BOSS KEY", 200, 250)
+    love.graphics.setFont(require'assets'.fonts.dd16)
+    love.graphics.print("NEED KEY!", 200, 250)
+    love.graphics.setFont(require'assets'.fonts.ns13)
     love.graphics.setColor(1, 1, 1, 1)
 
     if self.state == self.STATES.SELECTING then
-        love.graphics.print("ROOM NAME: "..self.rooms[self.previewRoom].displayName, 200, 200)
+        --love.graphics.print("ROOM NAME: "..self.rooms[self.previewRoom].displayName, 200, 200)
         local roomToEnter = self.rooms[self.previewRoom]
         if roomToEnter.prizeItem ~= nil then
             if roomToEnter.prizeItem:is(KeyBoss) then
-                love.graphics.print("BOSS KEY", 200, 300)
+            --    love.graphics.print("BOSS KEY", 200, 300)
             end
             if roomToEnter.prizeItem:is(BagDrop) then
-                love.graphics.print("COIN BAG", 200, 300)
+            --    love.graphics.print("COIN BAG", 200, 300)
             end
         end
         local imageToDraw = blueSquare
@@ -206,12 +238,12 @@ function Dungeon:draw()
                 heightSep = -8
             end
 
-            love.graphics.draw(imageToDraw, 100 + i * 32, 100 + heightSep)
+            love.graphics.draw(imageToDraw, 100 + i * 32, 10 + self.roomsDisplay[i].height)
         end
 
         --DEBUG
-        love.graphics.print(self.previewRoom, 300, 100)
-        love.graphics.print(self.activeRoom, 200, 100)
+       -- love.graphics.print(self.previewRoom, 300, 100)
+       -- love.graphics.print(self.activeRoom, 200, 100)
     end
 
     if self.state == self.STATES.ACTIVE then

@@ -4,8 +4,6 @@ Entity = Object:extend()
 function Entity:new(x, y)
     self.x = x
     self.y = y
-    self.width = w
-    self.height = h
 end
 
 function Entity:addToGame(image, x, y)
@@ -27,10 +25,25 @@ function Entity:draw()
 
 end
 
+function Entity:getDirectionToObject(target)
+    local tsx, tsy = target:getCenter()
+    local sx, sy = self:getCenter()
+    local direction = (math.atan2(tsy - sy, tsx - sx))
+
+    return direction
+end
+
 function Entity:BossDefeat()
     if self.isBoss == true then
         --idk some dying code here that may spawn a item or end the level
     end
+end
+
+function Entity:drawDebugHitbox()
+    local x,y,w,h = self.world:getRect(self)
+    love.graphics.setColor(0,1,0)
+    love.graphics.rectangle('line', x, y, w, h)
+    love.graphics.setColor(1,1,1)
 end
 
 function Entity:Destroy()

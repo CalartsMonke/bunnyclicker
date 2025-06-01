@@ -12,6 +12,7 @@ function WeaponGoldGun:new()
     self.delayMax = 0.05
     self.uses = 2
     self.image = require('assets').images.goldGun
+        self.name = "GOLD GUN"
 end
 
 function WeaponGoldGun:update(dt)

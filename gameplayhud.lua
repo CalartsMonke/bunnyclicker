@@ -24,6 +24,8 @@ local gameplayHud = {
     coinIconImage = require 'assets'.images.hudCoin,
     keyIconImage = require 'assets'.images.keyIcon,
     keyIconImageDotted = require 'assets'.images.keyIconDotted,
+
+    showExtraInfo = false
 }
 
 
@@ -33,6 +35,12 @@ function gameplayHud:update()
 end
 
 function gameplayHud:draw()
+
+    if love.keyboard.isDown('lshift') then
+        self.showExtraInfo = true
+    else
+        self.showExtraInfo = false
+    end
 
     --draw empty health
     love.graphics.setColor(0, 0, 0, 1)
@@ -65,6 +73,12 @@ function gameplayHud:draw()
     local playerweapon = player.equippedWeapon
     if playerweapon ~= nil then
         love.graphics.draw(playerweapon.image, self.weaponIconPosX, self.weaponIconPosY)
+
+        if self.showExtraInfo then
+            love.graphics.setFont(assets.fonts.dd16)
+            love.graphics.print(playerweapon.name, self.weaponIconPosX + 100, self.weaponIconPosY)
+            love.graphics.setFont(assets.fonts.ns13)
+        end
     end
 
 

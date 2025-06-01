@@ -15,7 +15,7 @@ local assets =
         dagger1 = love.graphics.newImage('/img/dagger1.png/'),
         assualtGun = love.graphics.newImage('/img/AssGun.png/'),
         goldGun = love.graphics.newImage('/img/goldGun.png/'),
-        brokenBottle = love.graphics.newImage('/img/brokenbottleicon.png/'),
+        brokenBottle = love.graphics.newImage('/img/brokenBottle.png/'),
 
         slash1 = love.graphics.newImage('/img/slash1.png/'),
         bossKey = love.graphics.newImage('/img/bossKey.png/'),
@@ -25,6 +25,15 @@ local assets =
         grayRoomSquare = love.graphics.newImage('/img/grayRoomSquare.png/'),
         shopRoomSquare = love.graphics.newImage('/img/shopRoomSquare.png/'),
         bossRoomSquare = love.graphics.newImage('/img/bossRoomSquare.png/'),
+
+        enemies =
+        {
+            dasherBun =
+            {
+                dasherbun_dash = love.graphics.newImage('/img/enemies/dasherbun/dasherbun_dash.png/'),
+                dasherbun_idle = love.graphics.newImage('/img/enemies/dasherbun/dasherbun_idle.png/'),
+            },
+        },
 
     },
 
