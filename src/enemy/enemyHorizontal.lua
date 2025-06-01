@@ -21,6 +21,7 @@ end
 
 
 function enemyHorizontal:update(dt)
+    world:update(self, self.x, self.y)
     self:updatePlayingState()
     if self.isPlaying == true then
 
