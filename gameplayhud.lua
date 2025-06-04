@@ -86,12 +86,14 @@ function gameplayHud:draw()
     for i = 1, #player.activeItems, 1 do
         local item = player.activeItems[i]
         
-        love.graphics.draw(item.image, self.activeItemsPosX + (i - 1) * self.activeItemsPosSep, self.activeItemsPosY)
-        local number = math.ceil(item.rechargeTimeMax - item.rechargeTime)
-        if number > 0 then
-            love.graphics.setFont(assets.fonts.dd16)
-            love.graphics.print(number, math.floor(350 + (i - 1) * 80), math.floor(270))
-            love.graphics.setFont(assets.fonts.ns13)
+        if item ~= nil then
+            love.graphics.draw(item.image, self.activeItemsPosX + (i - 1) * self.activeItemsPosSep, self.activeItemsPosY)
+            local number = math.ceil(item.rechargeTimeMax - item.rechargeTime)
+            if number > 0 then
+                love.graphics.setFont(assets.fonts.dd16)
+                love.graphics.print(number, math.floor(350 + (i - 1) * 80), math.floor(270))
+                love.graphics.setFont(assets.fonts.ns13)
+            end
         end
     end
 end

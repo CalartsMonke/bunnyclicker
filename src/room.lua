@@ -39,11 +39,12 @@ function RoomLevel:SetRoomEntities(currentRoom)
         self.displayName = 'THIS IS FLIPPING EPIC'
  
         self.entityList = {}
-        dungeon:InstanceCreateOnCell(self, e1(), 1, 3)
-        dungeon:InstanceCreateOnCell(self, e2(), 4, 6)
-        dungeon:InstanceCreateOnCell(self, e1(), 12, 3)
-        dungeon:InstanceCreateOnCell(self, e2(), 9, 7)
-        dungeon:InstanceCreateOnCell(self, e1(), 5, 6)
+        local list = self.entityList
+        dungeon:InstanceCreateOnCell(list, e1(), 1, 3)
+        dungeon:InstanceCreateOnCell(list, e2(), 4, 6)
+        dungeon:InstanceCreateOnCell(list, e1(), 12, 3)
+        dungeon:InstanceCreateOnCell(list, e2(), 9, 7)
+        dungeon:InstanceCreateOnCell(list, e1(), 5, 6)
 
     end
 

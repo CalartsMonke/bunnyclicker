@@ -40,9 +40,16 @@ self.boxY = 0
 --ITEMS
 self.activeItems = {
     Gun(),
-    require 'src.items.brokenbottle'(),
-    require 'src.items.goldgun'()
 }
+self.activeItemMax = 1
+self.consuambleItems = {
+
+}
+self.consumableItemsMax = 1
+self.passiveItems = {
+
+}
+self.passiveItemsMax = 999
 
 --damage stats
 self.equippedWeapon = require('src.weapons.weapon_brokenBottle')()
@@ -54,9 +61,6 @@ self.maxHp = 3
 self.currentHp = self.maxHp
 self.invicbilityMax = 1.5
 self.invicbility = self.invicbilityMax
-
-
-
 
 self.rotate = 0
 self.rotateMax = 0
@@ -99,20 +103,38 @@ end
 function Player:keypressed(key, scancode, isrepeat)
     local items = self.activeItems
     if key == 'z' then
-        if items[1].Use ~= nil then
-            self.activeItems[1]:Use()
+        if items[1] ~= nil then
+            if items[1].Use ~= nil then
+                self.activeItems[1]:Use()
+            end
         end
     end
     if key == 'x' then
-        if items[2].Use ~= nil then
-            self.activeItems[2]:Use()
+        if items[2] ~= nil then
+            if items[2].Use ~= nil then
+                self.activeItems[2]:Use()
+            end
         end
     end
     if key == 'c' then
-        if items[3].Use ~= nil then
-        self.activeItems[3]:Use()
+        if items[3] ~= nil then
+            if items[3].Use ~= nil then
+            self.activeItems[3]:Use()
+            end
         end
     end
+end
+
+function Player:addItemToActives(item)
+
+end
+
+function Player:addItemToConsumable(item)
+
+end
+
+function Player:addItemToPassives(item)
+
 end
 
 function Player:updatePrevPos()
@@ -147,8 +169,10 @@ function Player:itemsUpdate(dt)
         self.equippedWeapon = require('src.weapons.weapon_dagger')()
     end
     for i = 1, #self.activeItems, 1 do
-        local item = self.activeItems[i]
-        item:update(dt)
+        if self.activeItems[i] ~= nil then
+            local item = self.activeItems[i]
+            item:update(dt)
+        end
 
     end
 end

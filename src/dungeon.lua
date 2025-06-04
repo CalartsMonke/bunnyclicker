@@ -314,8 +314,6 @@ function Dungeon:ConvertPositionToCell(x, y)
 
     local nx =  (math.floor((x / cellwidth)) * cellwidth) / _G.screenScale
     local ny =  (math.floor((y / cellheight)) * cellheight) / _G.screenScale
-    print("CELLX "..nx / 32)
-    print("CELLY "..ny / 32)
     return nx, ny
 end
 
@@ -330,8 +328,6 @@ function Dungeon:InstanceCreateOnCell(list, instance, cx, cy)
     instance.y = (cy * 32) + yOff
     local list = list
     table.insert(list, instance)
-    print(instance.x)
-    print(instance.y)
 end
 
 

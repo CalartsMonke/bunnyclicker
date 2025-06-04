@@ -14,6 +14,8 @@ enemyDasherBun = Enemy:extend()
 
 function enemyDasherBun:new(x, y)
     self.super.new(self,x,y)
+    self.type = 'EnemyDasherBun'
+    self:addToTags("EnemyDasherBun")
 
     self.hpMax = 20
     self.hp = self.hpMax

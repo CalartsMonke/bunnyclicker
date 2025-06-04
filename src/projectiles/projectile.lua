@@ -1,4 +1,4 @@
-local object = require "lib.classic"
+local object = require "src.entity"
 
 Projectile = object:extend()
 

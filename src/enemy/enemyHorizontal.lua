@@ -14,6 +14,8 @@ enemyHorizontal = Enemy:extend()
 
 function enemyHorizontal:new(x, y)
     self.super.new(self,x,y)
+    self.addToTags{"enemyHorizontal"}
+    self.type = "EnemyHorizontal"
     self.image = require('assets').images.enemy2
 
     self:addToGame(self.image, x, y)

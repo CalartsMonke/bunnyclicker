@@ -11,6 +11,8 @@ Enemy = entity:extend()
 function Enemy:new(x, y)
     self.x = x or 100
     self.y = y or 100
+    self.type = "Enemy"
+    self:addToTags("Enemy")
 
     self.STATES =
  {
@@ -45,7 +47,7 @@ function Enemy:TakeDamage(damage, aggrotoadd)
         self.hp = self.hp - damage
         
         --increase aggro
-        self.aggro = self.aggro + (aggrotoadd * self.aggroMult)
+        --self.aggro = self.aggro + (aggrotoadd * self.aggroMult)
     end
 end
 
