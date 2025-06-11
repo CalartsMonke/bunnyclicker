@@ -36,8 +36,10 @@ local gameBoxHeight = 230
 
 local partTable = require 'particletable'
 
-local dungeon = require 'src.dungeon'
-local dungeon = dungeon()
+local dungeon = require 'dungeonFile'
+_G.dungeon = dungeon
+local gameHud = require 'gameplayhud'
+_G.gameHud = gameHud
 
 
 local entities = require 'roomEntities'
@@ -46,7 +48,7 @@ local player = game.player
 _G.player = player
 table.insert(entities, player)
 
-local gameHud = require 'gameplayhud'
+
 
 local mx, my
 

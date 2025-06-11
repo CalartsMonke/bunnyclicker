@@ -11,6 +11,8 @@ function GoldGun:new()
     self.image = require('assets').images.goldGun
     self.state = self.STATES.INACTIVE
     self.name = "Gold Gun"
+    self.price = 17
+    self.isActive = true
     self.rechargeTimeMax = 10
     self.rechargeTime = 0
 end

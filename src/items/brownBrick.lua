@@ -13,6 +13,8 @@ function BrownBrick:new()
     self.name = "Brown Brick"
     self.rechargeTimeMax = 0
     self.rechargeTime = 0
+    self.price = 3
+    self.isConsumable = true
 
     self.damage = 0
 end
@@ -29,7 +31,7 @@ end
 function BrownBrick:Use()
         local sx, sy = _G.player:getCenter()
         local item = require "src.projectiles.projectile_brownBrick"(sx - 8,  sy - 8)
-        self:removeFromPlayerActives()
+        table.remove(_G.player.consumableItems, 1)
 end
 
 function BrownBrick:draw()

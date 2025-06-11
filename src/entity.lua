@@ -46,6 +46,7 @@ function Entity:hasTag(tag)
             end
         end
     end
+    
 
     if tagFound == true then
         return true

@@ -54,12 +54,12 @@ end
 
 
 function enemyDasherBun:update(dt)
+    self:updateCollisionTriangle(dt)
     self:updatePlayingState()
     if self.isPlaying == true then
         if self.state == self.STATES.IDLE then
             world:update(self, self.x, self.y)
             self.dashTimer = self.dashTimer - dt
-
 
             if self.dashTimer <= 0 then
                 self.state = self.STATES.DASHING
@@ -131,7 +131,10 @@ function enemyDasherBun:draw()
         end
         if self.state == self.STATES.DASHING then
             self.image = require 'assets'.images.enemies.dasherBun.dasherbun_dash
+
         end
+        self:drawCollisionTriangle()
+
 
         local originOffset = 0
 

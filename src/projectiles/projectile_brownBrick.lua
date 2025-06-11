@@ -57,6 +57,12 @@ function ProjectileBrownBrick:update(dt)
             if item.isPlaying == true then
             
                 col.other:TakeDamage(self.damage)
+                
+                local num = love.math.random(0, 10)
+
+                if num >= 7 then
+                    local drop = require 'src.collectible.brownBrick'(self.x, self.y)
+                end
                 self:Destroy()
             end
         end

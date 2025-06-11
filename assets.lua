@@ -27,6 +27,20 @@ local assets =
         shopRoomSquare = love.graphics.newImage('/img/shopRoomSquare.png/'),
         bossRoomSquare = love.graphics.newImage('/img/bossRoomSquare.png/'),
 
+        hud =
+        {
+            itemFrame = love.graphics.newImage('/img/hud/itemBox.png'),
+            activePaper = love.graphics.newImage('/img/hud/activePaper.png/'),
+            consumablePaper = love.graphics.newImage('/img/hud/consumablePaper.png/'),
+            progressBar = love.graphics.newImage('/img/hud/progressBar.png'),
+
+            shopkeeper =
+            {
+                idle1 = love.graphics.newImage('img/hud/shopkeeper_idle1.png'),
+                talk = love.graphics.newImage('img/hud/shopkeeper_talk.png'),
+            },
+        },
+
         projectiles =
         {
             brownBrick = love.graphics.newImage('/img/projectiles/proj_brownBrick.png/'),
@@ -67,6 +81,9 @@ local assets =
         gunshot2 = love.audio.newSource('/aud/gunshot2.mp3/', 'static'),
         slash1 = love.audio.newSource('/aud/slash1.mp3/', 'static'),
         slash2 = love.audio.newSource('/aud/slash2.mp3/', 'static'),
+        squeak1 = love.audio.newSource('/aud/mousesqueak1.mp3/', 'static'),
+        squeak2 = love.audio.newSource('/aud/mousesqueak2.mp3/', 'static'),
+
 
     },
 

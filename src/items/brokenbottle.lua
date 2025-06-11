@@ -11,8 +11,10 @@ function Brokenbottle:new()
     self.image = require('assets').images.brokenBottle
     self.state = self.STATES.INACTIVE
     self.name = "Broken Bottle"
+    self.isActive = true
     self.rechargeTimeMax = 10
     self.rechargeTime = 0
+    self.price = 4
 
     self.damage = 6
 end

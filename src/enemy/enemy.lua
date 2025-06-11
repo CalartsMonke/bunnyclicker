@@ -11,6 +11,8 @@ Enemy = entity:extend()
 function Enemy:new(x, y)
     self.x = x or 100
     self.y = y or 100
+    self.width = 32
+    self.height = 32
     self.type = "Enemy"
     self:addToTags("Enemy")
 
@@ -32,15 +34,57 @@ function Enemy:new(x, y)
     self.aggro = 0
     self.aggroDecrease = 2
     self.aggroMult = 1
-   
-
 
 
     --bullets
     self.bulletTimerMax = 3
     self.bulletTimer = self.bulletTimerMax
+
+    self.triAngle = 90
+    self.triAlphaMax = 0.4
+    self.triAlphaCurrent = 0
+    self.trianglePoints = {}
+    local tp = self.trianglePoints
+    local sx, sy = self:getCenter()
+    tp[1] = {sx, sy - 16}
+    tp[2] = {sx - 16, sy + 16}
+    tp[3] = {sx + 16, sy + 16}
 end
 
+function Enemy:updateCollisionTriangle(dt)
+    local distance = 32
+    self.triAngle = (self.triAngle + 100 * dt)
+    local sx, sy = self:getCenter()
+    local angle = self.triAngle % 360
+    local tp = self.trianglePoints
+    tp[1][1] = sx + math.cos(math.rad(90 + angle)) * distance;
+    tp[1][2] = sy + math.sin(math.rad(90 + angle)) * distance;
+    
+    tp[2][1] = sx + math.cos(math.rad(210 + angle)) * distance;
+    tp[2][2] = sy + math.sin(math.rad(210 + angle)) * distance;
+    
+    tp[3][1] = sx + math.cos(math.rad(330 + angle)) * distance;
+    tp[3][2] = sy + math.sin(math.rad(330 + angle)) * distance;
+    if self.state == self.STATES.DASHING then
+        if self.triAlphaCurrent <= self.triAlphaMax then
+        self.triAlphaCurrent = self.triAlphaCurrent + dt
+        end
+    else
+        if self.triAlphaCurrent >= 0 then
+            self.triAlphaCurrent = self.triAlphaCurrent - dt
+        end
+    end 
+end
+
+function Enemy:drawCollisionTriangle()
+    local tp = self.trianglePoints
+    local verticies = { tp[1][1], tp[1][2], tp[2][1], tp[2][2], tp[3][1], tp[3][2]}
+
+    love.graphics.setColor(1, 0, 0, self.triAlphaCurrent)
+    love.graphics.polygon('fill', verticies)
+    love.graphics.setColor(1, 1, 1, 1)
+
+end
 
 function Enemy:TakeDamage(damage, aggrotoadd)
     if self.state ~= self.STATES.NONE or self.STATES.DEAD then

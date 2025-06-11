@@ -11,6 +11,8 @@ function AssaultGun:new()
     self.image = require('assets').images.assualtGun
     self.state = self.STATES.INACTIVE
     self.name = "Assault Gun"
+    self.isActive = true
+    self.price = 10
     self.rechargeTimeMax = 10
     self.rechargeTime = 0
 end

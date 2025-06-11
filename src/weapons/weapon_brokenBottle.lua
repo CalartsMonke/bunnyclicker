@@ -22,10 +22,11 @@ function WeaponBrokenBottle:update(dt)
 end
 
 function WeaponBrokenBottle:use(owner, target)
-    if target.isBoss == false then
     if self.delay >= self.delayMax then
     local damage = self.damage + owner.baseDamage
-
+    if target.isBoss == true then
+       damage = 15 
+    end
     target:TakeDamage(damage, owner.aggroAdd)
     self.delay = self.delay - self.delayMax
 
@@ -41,9 +42,6 @@ function WeaponBrokenBottle:use(owner, target)
     table.insert(partTable ,partStation(owner.x, owner.y, spark.part, 1))
 
     self.uses = self.uses -1
-
-    
-    end
     end
 end
 

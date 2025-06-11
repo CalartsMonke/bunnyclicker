@@ -37,13 +37,14 @@ self.resumesword.state = 2
 self.boxX = 0
 self.boxY = 0
 
+
 --ITEMS
 self.activeItems = {
     Gun(),
 }
 self.activeItemMax = 1
-self.consuambleItems = {
-
+self.consumableItems = {
+    require 'src.items.brownBrick'()
 }
 self.consumableItemsMax = 1
 self.passiveItems = {
@@ -110,9 +111,9 @@ function Player:keypressed(key, scancode, isrepeat)
         end
     end
     if key == 'x' then
-        if items[2] ~= nil then
-            if items[2].Use ~= nil then
-                self.activeItems[2]:Use()
+        if self.consumableItems[1] ~= nil then
+            if self.consumableItems[1].Use ~= nil then
+                self.consumableItems[1]:Use()
             end
         end
     end
@@ -125,15 +126,43 @@ function Player:keypressed(key, scancode, isrepeat)
     end
 end
 
-function Player:addItemToActives(item)
+function Player:addToItems(item)
+    if item.isConsumable == true then
+        self:addItemToConsumables(item)
+    end
+    if item.isActive == true then
+        self:addItemToActives(item)
+    end
+    if item.isPassive == true then
+        self:addItemToPassives(item)
+    end
 
 end
 
-function Player:addItemToConsumable(item)
+function Player:addItemToActives(item)
+    local items = self.activeItems
+    local itemsMax = self.activeItemMax
+
+    items[1] = item
+end
+
+function Player:addItemToConsumables(item)
+    local items = self.consumableItems
+    local itemsMax = self.consumableItemsMax
+
+    items[1] = item
 
 end
 
 function Player:addItemToPassives(item)
+    local items = self.passiveItems
+    local itemsMax = self.passiveItemsMax
+
+    if #items < itemsMax then
+        table.insert(items, item)
+    else
+        
+    end
 
 end
 

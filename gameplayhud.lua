@@ -1,5 +1,6 @@
 local player = require ('gameStats').player
 local game = require ('gameStats')
+local dungeon = _G.dungeon
 local assets = require 'assets'
 local coinTextOffX = 40
 local coinTextOffY = 10
@@ -17,16 +18,25 @@ local gameplayHud = {
     keyIconPosX = 5,
     keyIconPosY = 310,
 
-    activeItemsPosX = game.gameWidth - 300,
-    activeItemsPosY = game.gameHeight - 75,
+    activeItemsPosX = game.gameWidth/2 + 96,
+    activeItemsPosY = game.gameHeight - 64,
     activeItemsPosSep = 80,
+
+    consumableItemsPosX = game.gameWidth - 96,
+    consumableItemsPosY = game.gameHeight - 64,
 
     coinIconImage = require 'assets'.images.hudCoin,
     keyIconImage = require 'assets'.images.keyIcon,
     keyIconImageDotted = require 'assets'.images.keyIconDotted,
 
-    showExtraInfo = false
+    showExtraInfo = false,
+
+    MODES = {
+        NORMAL = 1,
+        SHOP = 2,
+    },
 }
+    gameplayHud.mode = gameplayHud.MODES.NORMAL
 
 
 
@@ -34,8 +44,7 @@ function gameplayHud:update()
 
 end
 
-function gameplayHud:draw()
-
+function gameplayHud:drawNormalHud()
     if love.keyboard.isDown('lshift') then
         self.showExtraInfo = true
     else
@@ -83,19 +92,52 @@ function gameplayHud:draw()
 
 
     --DRAWING ITEMS
-    for i = 1, #player.activeItems, 1 do
-        local item = player.activeItems[i]
+        local item = player.activeItems[1]
         
         if item ~= nil then
-            love.graphics.draw(item.image, self.activeItemsPosX + (i - 1) * self.activeItemsPosSep, self.activeItemsPosY)
+            love.graphics.draw(item.image, self.activeItemsPosX, self.activeItemsPosY)
             local number = math.ceil(item.rechargeTimeMax - item.rechargeTime)
             if number > 0 then
                 love.graphics.setFont(assets.fonts.dd16)
-                love.graphics.print(number, math.floor(350 + (i - 1) * 80), math.floor(270))
+                love.graphics.print(number, math.floor(380), math.floor(320))
                 love.graphics.setFont(assets.fonts.ns13)
             end
         end
+        love.graphics.setColor(1, 1, 1, 0.2)
+        love.graphics.draw(assets.images.hud.itemFrame, self.activeItemsPosX, self.activeItemsPosY)
+        love.graphics.draw(assets.images.hud.activePaper, self.activeItemsPosX - 64, self.activeItemsPosY)
+        love.graphics.setColor(1, 1, 1, 1)
+    --DRAWING CONSUMABLES
+    if player.consumableItems[1] ~= nil then
+        local item = player.consumableItems[1]
+        love.graphics.draw(item.image, self.consumableItemsPosX, self.consumableItemsPosY)
     end
+    love.graphics.setColor(1, 1, 1, 0.2)
+    love.graphics.draw(assets.images.hud.itemFrame, self.consumableItemsPosX, self.consumableItemsPosY)
+    love.graphics.draw(assets.images.hud.consumablePaper, self.consumableItemsPosX - 64, self.consumableItemsPosY)
+    love.graphics.setColor(1, 1, 1, 1)
+end
+
+function gameplayHud:drawShopHud()
+
+end
+
+function gameplayHud:draw()
+
+
+
+    if self.mode == self.MODES.NORMAL then
+        self:drawNormalHud()
+    end
+
+    if self.mode == self.MODES.SHOP then
+        self:drawShopHud()
+    end
+
+
+
+
+    
 end
 
 return gameplayHud
