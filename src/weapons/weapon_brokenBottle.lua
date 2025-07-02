@@ -42,6 +42,8 @@ function WeaponBrokenBottle:use(owner, target)
     table.insert(partTable ,partStation(owner.x, owner.y, spark.part, 1))
 
     self.uses = self.uses -1
+
+    return true
     end
 end
 

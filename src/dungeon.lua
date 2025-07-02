@@ -328,6 +328,8 @@ function Dungeon:InstanceCreateOnCell(list, instance, cx, cy)
     instance.y = (cy * 32) + yOff
     local list = list
     table.insert(list, instance)
+
+    return instance
 end
 
 

@@ -12,8 +12,8 @@ function RoomLevel:new(roomID, parent)
     self.dungeon = parent
     dungeon = parent
     self.clearWait = 0
-    self.prizeClearX = love.math.random(100, 200)
-    self.prizeClearY = love.math.random(100, 200)
+    self.prizeClearX = 640/2
+    self.prizeClearY = 360/2
     local bag = bagdrop(self.prizeClearX, self.prizeClearY, love.math.random(1, 3))
     bag.parentRoom = self
     bag.isActive = false
@@ -34,6 +34,7 @@ function RoomLevel:SetRoomEntities(currentRoom)
     if id == 1 then
         local e1 = require 'src.enemy.enemyHorizontal'
         local e2 = require 'src.enemy.dasherBun'
+        local e3 = require 'src.enemy.hopperBun'
         self.spawnTimeDelayMax = 1
         self.activeEnemyLimit = 3
         self.displayName = 'THIS IS FLIPPING EPIC'
@@ -41,7 +42,7 @@ function RoomLevel:SetRoomEntities(currentRoom)
         self.entityList = {}
         local list = self.entityList
         dungeon:InstanceCreateOnCell(list, e1(), 1, 3)
-        dungeon:InstanceCreateOnCell(list, e2(), 4, 6)
+        dungeon:InstanceCreateOnCell(list, e3(), 4, 6)
         dungeon:InstanceCreateOnCell(list, e1(), 12, 3)
         dungeon:InstanceCreateOnCell(list, e2(), 9, 7)
         dungeon:InstanceCreateOnCell(list, e1(), 5, 6)
@@ -116,6 +117,7 @@ function RoomLevel:update(dt)
     if self.prizeItem ~= nil then
         if self.clearWait >= 0.6 and self.prizeItem.isActive == false then
             self.prizeItem.isActive = true
+            self.prizeItem.bounceYDelta = 1
             table.insert(entities, self.prizeItem)
         end
     end

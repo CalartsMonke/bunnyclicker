@@ -7,6 +7,7 @@ local entities = require 'roomEntities'
 KeyBoss = Collectible:extend()
 
 function KeyBoss:new(x, y, parent)
+    self.super.new(self)
     self.isActive = false
     self.parentRoom = parent or nil
     self.image = require('assets').images.bossKey
@@ -24,11 +25,15 @@ function KeyBoss:new(x, y, parent)
 
     self.states = {1, 2}
     self.state = self.states[1]
+
+    self.yExtra = 0
 end
 
 
 function KeyBoss:update(dt)
     if self.isActive == true then
+
+        self:updateBounce(dt)
 
         if self.state == self.states[2] then
             self.currentTime = self.currentTime + dt
@@ -56,7 +61,7 @@ end
 
 function KeyBoss:draw()
     if self.isActive == true then
-        love.graphics.draw(self.image, self.x, self.y)
+        love.graphics.draw(self.image, self.x, self.y + self.yExtra)
     end
 end
 

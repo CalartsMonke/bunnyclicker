@@ -8,6 +8,7 @@ local gameStats= require 'gameStats'
 BagDrop = Collectible:extend()
 
 function BagDrop:new(x, y, amountToSpawn)
+    self.super.new(self)
     self.parentRoom = nil
     self.image = require 'assets'.images.coinBag
     self.isActive = false
@@ -48,6 +49,11 @@ function BagDrop:update(dt)
 
 if self.isActive == true then
 
+    if self.state == self.states[1] then
+        self:MoveWithSpeed(dt)
+        self:updateBounce(dt)
+    end
+
     self.spawnTime = self.spawnTime + dt
 
     if self.state == self.states[2] then
@@ -83,16 +89,6 @@ if self.isActive == true then
 
 
 end
-end
-
-function BagDrop:draw()
-    if self.isActive == true then
-    love.graphics.draw(self.image, self.x, self.y)
-    local x,y,w,h = self.world:getRect(self)
-    love.graphics.setColor(0,1,0)
-    love.graphics.rectangle('line', x, y, w, h)
-    love.graphics.setColor(1,1,1)
-    end
 end
 
 return BagDrop

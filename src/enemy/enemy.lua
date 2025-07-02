@@ -65,15 +65,7 @@ function Enemy:updateCollisionTriangle(dt)
     
     tp[3][1] = sx + math.cos(math.rad(330 + angle)) * distance;
     tp[3][2] = sy + math.sin(math.rad(330 + angle)) * distance;
-    if self.state == self.STATES.DASHING then
-        if self.triAlphaCurrent <= self.triAlphaMax then
-        self.triAlphaCurrent = self.triAlphaCurrent + dt
-        end
-    else
-        if self.triAlphaCurrent >= 0 then
-            self.triAlphaCurrent = self.triAlphaCurrent - dt
-        end
-    end 
+     
 end
 
 function Enemy:drawCollisionTriangle()

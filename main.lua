@@ -1,13 +1,29 @@
 require 'love'
+love.math.setRandomSeed(love.timer.getTime())
 love.graphics.setDefaultFilter("nearest", "nearest")
 Object = require 'lib.classic'
 
 
+local text = require 'textbox'
+text.configure.audio_table(require'assets'.sounds)
+text.configure.add_text_sound(require'assets'.sounds.text1, 0.2) 
+
+local textTextbox = text.new('center',{
+     color = {1,1,1,1},
+    shadow_color = {0.5,0.5,1,0.4},
+    font = require'assets'.fonts.dd16,
+    character_sound = true, 
+    sound_every = 1, 
+    sound_number = 1,
+    adjust_line_height = 0
+    }
+)
+    textTextbox:send("GEE I SURE DO [color=#ff0000]LOVE[/color][rainbow][bounce] FRESH [u] FLY[/u] [shake]SOUP[/shake]![/rainbow]")
 
 flux = require 'lib.flux'
 local roomy = require 'lib.roomy'
 
-love.hasDeprecationOutput(false)
+love.hasDeprecationOutput('false')
 local world = require 'world'
 local assets = require 'assets'
 local Enemy = require 'src.enemy.enemy'
@@ -93,6 +109,12 @@ end
 function love.mousepressed(x, y, button, istouch)
     if button == 1 then -- Versions prior to 0.10.0 use the MouseConstant 'l'
         player.leftmbpressed = true
+    end
+
+    player:mousepressed(x, y, button, istouch)
+    textTextbox:continue()
+    if textTextbox:is_finished() then
+        textTextbox:send("[textspeed=0.3][warble=-5]THIS IS A EXTRA MESSAGE... STRANGE ISINT IT?[/warble][/textspeed]", 256)
     end
  end
 
@@ -204,6 +226,7 @@ function love.keypressed(key, scancode, isrepeat)
     end
 
     dungeon:update(dt)
+    gameHud:update(dt)
 
     
     
@@ -229,7 +252,7 @@ function love.keypressed(key, scancode, isrepeat)
     --ROOM DRAWING CODE PLACEHOLDER
       -- draw the level
       --init canvas
-      love.graphics.setCanvas(canvas)
+      love.graphics.setCanvas({canvas, stencil=true})
       love.graphics.clear()
       canvas:setFilter("nearest")
   

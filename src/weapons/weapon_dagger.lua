@@ -13,6 +13,8 @@ function WeaponDagger:new()
     self.uses = 99
     self.image = require 'assets'.images.dagger1
     self.name = 'DAGGER'
+    self.canChargeWeapon = true
+    self.chargeAmount = 3
     
     self.basic = true
 end
@@ -40,7 +42,11 @@ function WeaponDagger:use(owner, target)
     end
     local spark = sparklePart()
     table.insert(partTable ,partStation(owner.x, owner.y, spark.part, 1))
+
+    return true
     end
+
+
 end
 
 function WeaponDagger:draw()

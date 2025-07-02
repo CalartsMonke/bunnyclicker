@@ -7,8 +7,10 @@ local coinTextOffY = 10
 local hpOffX = 20
 local hpOffY = 40
 
+local extraAngleIncrease = 1
 
 local gameplayHud = {
+
     heartIconPosX = 20,
     heartIconPosY = 300,
     weaponIconPosX = 20,
@@ -40,8 +42,8 @@ local gameplayHud = {
 
 
 
-function gameplayHud:update()
-
+function gameplayHud:update(dt)
+    extraAngleIncrease = extraAngleIncrease + dt * 50
 end
 
 function gameplayHud:drawNormalHud()
@@ -102,6 +104,25 @@ function gameplayHud:drawNormalHud()
                 love.graphics.print(number, math.floor(380), math.floor(320))
                 love.graphics.setFont(assets.fonts.ns13)
             end
+
+            local angleIncrease = 360/item.currentCharges
+
+            for i=1, item.currentCharges do
+                
+
+                local distance = 16
+                local angle = (0 + angleIncrease * i-1) + extraAngleIncrease
+                local tp = self.trianglePoints
+                local dx = self.activeItemsPosX + item.image:getWidth()/2 + math.cos(math.rad(90 + angle)) * distance;
+                local dy = self.activeItemsPosY + item.image:getHeight()/2 + math.sin(math.rad(90 + angle)) * distance;
+
+                love.graphics.draw(assets.images.star, dx, dy)
+            end
+
+
+
+
+
         end
         love.graphics.setColor(1, 1, 1, 0.2)
         love.graphics.draw(assets.images.hud.itemFrame, self.activeItemsPosX, self.activeItemsPosY)
@@ -121,6 +142,8 @@ end
 function gameplayHud:drawShopHud()
 
 end
+
+
 
 function gameplayHud:draw()
 

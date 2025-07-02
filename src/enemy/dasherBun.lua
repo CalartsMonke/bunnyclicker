@@ -54,6 +54,21 @@ end
 
 
 function enemyDasherBun:update(dt)
+
+
+    if self.state == self.STATES.DASHING then
+        if self.triAlphaCurrent <= self.triAlphaMax then
+        self.triAlphaCurrent = self.triAlphaCurrent + dt
+        end
+    else
+        if self.triAlphaCurrent >= 0 then
+            self.triAlphaCurrent = self.triAlphaCurrent - dt
+        end
+    end
+
+
+
+
     self:updateCollisionTriangle(dt)
     self:updatePlayingState()
     if self.isPlaying == true then

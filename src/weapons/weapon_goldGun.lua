@@ -45,7 +45,11 @@ function WeaponGoldGun:use(owner, target)
     end
     local spark = sparklePart()
     table.insert(partTable ,partStation(owner.x, owner.y, spark.part, 1))
+
+    return true
     end
+
+
 end
 
 function WeaponGoldGun:draw()

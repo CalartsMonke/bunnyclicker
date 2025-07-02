@@ -53,12 +53,36 @@ function RoomShop:new()
     self.boxXSep = self.boxWidth + 10
     self.boxYSep = 10
 
+
+
+    --TEXT BOX
+    self.textWrapLimit = 400
+    self.textBoxY = 100
+    self.textBoxX = 100
+    self.textX = 140
+    self.textY = 200
+    self.currentText = ""
+    self.textTable = {
+        autotags = "[]", -- This string is added at the start of every textbox, can include tags.
+        font = require'assets'.fonts.dd16, -- Default font for the textbox, love font object.
+        color = {1,1,1,1}, -- Default text color.
+        shadow_color = {1,1,1,1}, -- Default Drop Shadow Color.
+        print_speed = 0.05, -- How fast text prints.
+        adjust_line_height = 4, -- Adjust the default line spacing.
+        default_strikethrough_position = 0, -- Adjust the position of the strikethough line.
+        default_underline_position = 0, -- Adjust the position of the underline line.
+        character_sound = true, -- Use a voice when printing characters? True or false.
+        sound_number = 1, -- What voice to use when printing characters.
+        sound_every = 1, -- How many characters to wait before making another noise when printing text.
+        default_warble = 0 -- How much to adjust the voice when printing each character. 
+    }
+
     self.lettersToDisplay = 1
     self.isLeaving = false
     self.leaveTime = 1.5
-end
 
-local textspeed = 30
+    self.textBox = require'textbox'.new('left', self.textTable)
+end
 
 function RoomShop:keypressed(key, scancode, isrepeat)
 
@@ -70,8 +94,6 @@ function RoomShop:keypressed(key, scancode, isrepeat)
         self.buyingItem = true
         self.buyIndex = self.items[self.previewIndex]
         self.buyBar = progBar.new(0, 0, self.buyTimeMax, 1)
-
-        self.lettersToDisplay = string.len(self.talkText)
     end
 
     if key == 'a' then
@@ -92,8 +114,7 @@ function RoomShop:keypressed(key, scancode, isrepeat)
 
     if key == 'return' then
         self.isLeaving = true
-        self.talkText = require'src.textStrings'.shopnormal.leave
-        self.lettersToDisplay = 1
+        self.textBox:send(require'src.textStrings'.shopnormal.leave)
     end
 
     if key == 'u' then
@@ -114,7 +135,7 @@ function RoomShop:enter()
 
     self.lettersToDisplay = 1
     self.previewIndex = nil
-    self.talkText = require'src.textStrings'.shopnormal.welcome
+    self.textBox:send(require'src.textStrings'.shopnormal.welcome, self.textWrapLimit)
 
 end
 
@@ -149,8 +170,9 @@ function RoomShop:buySlot(index)
 
     end
 end
-local soundtimer = 0.2
+
 function RoomShop:update(dt)
+    self.textBox:update(dt)
 
     if self.buyingItem == true then
         
@@ -195,22 +217,8 @@ function RoomShop:update(dt)
     end
 
 
-    if self.lettersToDisplay < string.len(self.talkText) then
-        self.lettersToDisplay = self.lettersToDisplay + textspeed * dt
-        self.currentFrame = self.currentFrame + dt * 20
-
-        soundtimer = soundtimer - dt
-
-        if soundtimer <= 0 then
-            if math.random(0, 100) < 50 then
-                love.audio.play(require'assets'.sounds.squeak1)
-            else
-                love.audio.play(require'assets'.sounds.squeak2)
-            end
-            soundtimer = 0.1
-        end
-    else
-
+    if self.textBox:is_finished() == false then
+        self.currentFrame = self.currentFrame + dt * 15
     end
 
     if self.currentFrame > #self.animFrames + 1  then
@@ -225,9 +233,7 @@ function RoomShop:update(dt)
 end
 
 function RoomShop:draw()
-    love.graphics.setFont(require 'assets'.fonts.dd16)
-    love.graphics.print((self.talkText):sub(1, math.floor(self.lettersToDisplay)), 150, 200)
-    love.graphics.setFont(require 'assets'.fonts.ns13)
+    self.textBox:draw(self.textX, self.textY)
 
 
     --BUY BAR

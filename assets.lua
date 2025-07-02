@@ -34,6 +34,8 @@ local assets =
             consumablePaper = love.graphics.newImage('/img/hud/consumablePaper.png/'),
             progressBar = love.graphics.newImage('/img/hud/progressBar.png'),
 
+            barTarget = love.graphics.newImage('img/hud/barTarget.png'),
+
             shopkeeper =
             {
                 idle1 = love.graphics.newImage('img/hud/shopkeeper_idle1.png'),
@@ -44,6 +46,11 @@ local assets =
         projectiles =
         {
             brownBrick = love.graphics.newImage('/img/projectiles/proj_brownBrick.png/'),
+        },
+
+        items = 
+        {
+            ironpan = love.graphics.newImage("img/items/ironpan.png")
         },
 
         backgrounds = 
@@ -69,6 +76,18 @@ local assets =
                 dasherbun_dash = love.graphics.newImage('/img/enemies/dasherbun/dasherbun_dash.png/'),
                 dasherbun_idle = love.graphics.newImage('/img/enemies/dasherbun/dasherbun_idle.png/'),
             },
+            
+            hopperBun = 
+            {
+                hopperbun_idle = love.graphics.newImage('/img/enemies/bunhopper/bunhopper_idle.png/'),
+                hopperbun_hopping = love.graphics.newImage('/img/enemies/bunhopper/bunhopper_hopping.png/'),
+                hopperbun_resting = love.graphics.newImage('/img/enemies/bunhopper/bunhopper_resting.png/'),
+            },
+
+            talkerBun =
+            {
+                talkerbun_idle = love.graphics.newImage('img/enemies/talkerbun/talkerbun_idle.png')
+            },
         },
 
     },
@@ -83,6 +102,10 @@ local assets =
         slash2 = love.audio.newSource('/aud/slash2.mp3/', 'static'),
         squeak1 = love.audio.newSource('/aud/mousesqueak1.mp3/', 'static'),
         squeak2 = love.audio.newSource('/aud/mousesqueak2.mp3/', 'static'),
+        panaim = love.audio.newSource('aud/hitmark.mp3', 'static'),
+        panhit = love.audio.newSource('aud/fryingpan.mp3/', 'static'),
+        pancrit = love.audio.newSource('aud/pancrit.wav/', 'static'),
+        text1 = love.audio.newSource('aud/text1.wav/', 'static')
 
 
     },

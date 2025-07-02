@@ -38,9 +38,15 @@ self.boxX = 0
 self.boxY = 0
 
 
+--Shop stats
+self.shopNormalKarma = 100
+self.shopDarkKarma = 100
+self.shopDrugKarma = 100
+
+
 --ITEMS
 self.activeItems = {
-    Gun(),
+    require'src.items.ironpan'()
 }
 self.activeItemMax = 1
 self.consumableItems = {
@@ -53,12 +59,12 @@ self.passiveItems = {
 self.passiveItemsMax = 999
 
 --damage stats
-self.equippedWeapon = require('src.weapons.weapon_brokenBottle')()
+self.equippedWeapon = require('src.weapons.weapon_ironpan')()
 self.baseDamage = 1
 self.aggroAdd = 3
 
 --hp
-self.maxHp = 3
+self.maxHp = 5
 self.currentHp = self.maxHp
 self.invicbilityMax = 1.5
 self.invicbility = self.invicbilityMax
@@ -103,6 +109,11 @@ end
 
 function Player:keypressed(key, scancode, isrepeat)
     local items = self.activeItems
+
+    if key == 'p' then
+        self.equippedWeapon = require('src.weapons.weapon_ironpan')()
+    end
+
     if key == 'z' then
         if items[1] ~= nil then
             if items[1].Use ~= nil then
@@ -123,6 +134,10 @@ function Player:keypressed(key, scancode, isrepeat)
             self.activeItems[3]:Use()
             end
         end
+    end
+
+    if key == 'o' then
+        self.hasBossKey = true
     end
 end
 
@@ -206,6 +221,27 @@ function Player:itemsUpdate(dt)
     end
 end
 
+function Player:mousepressed(x, y, button, istouch)
+    if self.equippedWeapon.mousepressed ~= nil then
+        self.equippedWeapon:mousepressed(x, y, button, istouch)
+    end
+    for i = 1, #self.activeItems, 1 do
+        if self.activeItems[i] ~= nil then
+            local item = self.activeItems[i]
+            if item.mousepressed ~= nil then
+                item:mousepressed(x, y, button, istouch)
+            end
+        end
+    end
+
+    if button == 2 then
+        local sx, sy = _G.player:getCenter()
+        local item = require "src.projectiles.projectile_brownBrick"(sx - 8,  sy - 8)
+        
+    end
+
+end
+
 
 function Player:update(dt)
     self:updateRotate(dt)
@@ -252,7 +288,12 @@ function Player:update(dt)
             if item:is(Enemy) and item.isPlaying == true then
                 if (self.x > item.x and self.x < item.x + item.width) and (self.y > item.y and self.y < item.y + item.height) then
                     if self.leftmbpressed then
-                        self.equippedWeapon:use(self, item)
+                        if self.equippedWeapon:use(self, item) == true then
+                            if self.equippedWeapon.canChargeWeapon == true then
+                                self.activeItems[1].chargeProgress = self.activeItems[1].chargeProgress + self.equippedWeapon.chargeAmount
+                                self.activeItems[1]:processCharge()
+                            end
+                        end
 
 
                     end
@@ -297,6 +338,11 @@ function Player:update(dt)
     self.leftmbpressed = false
 end
 
+function Player:drawItems()
+    if self.equippedWeapon.draw ~= nil then 
+    self.equippedWeapon:draw()
+    end
+end
 
 
 function Player:draw()
@@ -308,6 +354,8 @@ function Player:draw()
 
         --draw image
         love.graphics.draw(self.image, self.x + 4, self.y + 4, self.rotate, 1, 1, 8, 8)
+
+        self:drawItems()
     end
 
 end

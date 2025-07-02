@@ -7,6 +7,7 @@ local entities = require 'roomEntities'
 CoinDrop = collectible:extend()
 
 function CoinDrop:new(x, y)
+    self.super.new(self)
 
     self.x = x
     self.y = y
