@@ -18,15 +18,18 @@ function enemyHorizontal:new(x, y)
     self.type = "EnemyHorizontal"
     self.image = require('assets').images.enemies.talkerBun.talkerbun_idle
 
+    self.prevHp = self.hp
     self:addToGame(self.image, x, y)
 end
 
 
 function enemyHorizontal:update(dt)
+
+    
     world:update(self, self.x, self.y)
     self:updatePlayingState()
     if self.isPlaying == true then
-
+        self:updateStatusEffects(dt)
         if self.hp <= 0 then
             self:Die()
         end
@@ -47,6 +50,7 @@ end
 
 function enemyHorizontal:draw()
     if self.isPlaying == true then
+        self:drawStatusEffects()
         love.graphics.draw(self.image, self.x, self.y, 0, 1, 1)
         love.graphics.print(tostring(self.hp), self.x + 5, self.y - 18)
         --love.graphics.print(self.bulletTimer, self.x + 5, self.y - 32)

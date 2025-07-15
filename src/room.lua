@@ -36,11 +36,21 @@ function RoomLevel:SetRoomEntities(currentRoom)
         local e2 = require 'src.enemy.dasherBun'
         local e3 = require 'src.enemy.hopperBun'
         self.spawnTimeDelayMax = 1
-        self.activeEnemyLimit = 3
+        self.activeEnemyLimit = 4
         self.displayName = 'THIS IS FLIPPING EPIC'
  
         self.entityList = {}
         local list = self.entityList
+        dungeon:InstanceCreateOnCell(list, e1(), 1, 3)
+        dungeon:InstanceCreateOnCell(list, e3(), 4, 6)
+        dungeon:InstanceCreateOnCell(list, e1(), 12, 3)
+        dungeon:InstanceCreateOnCell(list, e2(), 9, 7)
+        dungeon:InstanceCreateOnCell(list, e1(), 5, 6)
+        dungeon:InstanceCreateOnCell(list, e1(), 1, 3)
+        dungeon:InstanceCreateOnCell(list, e3(), 4, 6)
+        dungeon:InstanceCreateOnCell(list, e1(), 12, 3)
+        dungeon:InstanceCreateOnCell(list, e2(), 9, 7)
+        dungeon:InstanceCreateOnCell(list, e1(), 5, 6)
         dungeon:InstanceCreateOnCell(list, e1(), 1, 3)
         dungeon:InstanceCreateOnCell(list, e3(), 4, 6)
         dungeon:InstanceCreateOnCell(list, e1(), 12, 3)

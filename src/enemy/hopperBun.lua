@@ -12,6 +12,7 @@ function enemyHopperBun:new(x, y)
 
     self.hpMax = 20
     self.hp = self.hpMax
+    self.prevHp = self.hp
     self.image = require('assets').images.enemies.hopperBun.hopperbun_idle
 
     self.STATES =
@@ -70,6 +71,7 @@ local filter = function(item, other)
 end
 
 function enemyHopperBun:update(dt)
+    self:updateStatusEffects(dt)
 
 
     self.currentFrame = (self.currentFrame + 2 * dt)
@@ -169,6 +171,7 @@ end
 
 function enemyHopperBun:draw()
     if self.isPlaying == true then
+        self:drawStatusEffects()
         self:drawCollisionTriangle()
         local image = self.image
 

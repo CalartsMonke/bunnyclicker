@@ -111,7 +111,7 @@ function Player:keypressed(key, scancode, isrepeat)
     local items = self.activeItems
 
     if key == 'p' then
-        self.equippedWeapon = require('src.weapons.weapon_ironpan')()
+        self.equippedWeapon = require('src.weapons.weapon_assualtGun')()
     end
 
     if key == 'z' then
@@ -349,7 +349,7 @@ function Player:draw()
     if self.state == 1 then
         local x,y,w,h = self.world:getRect(self)
         love.graphics.setColor(0,1,0)
-       love.graphics.rectangle('line', x, y, w, h)
+       --love.graphics.rectangle('line', x, y, w, h)
         love.graphics.setColor(1,1,1)
 
         --draw image

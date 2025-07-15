@@ -15,6 +15,10 @@ function Entity:addToGame(image, x, y, w, h)
     self.height = self.image:getHeight() or h
     self.world = require('world')
 
+    if self:is(Enemy) then
+        self.statusEffects = {}
+    end
+
     self.world:add(self, self.x, self.y, self.width, self.height)
 end
 
@@ -114,7 +118,13 @@ function Entity:drawDebugHitbox()
 end
 
 function Entity:Destroy()
-    require 'world':remove(self)
+
+    if require 'world':hasItem(self) then
+        require 'world':remove(self)
+    else
+        print("MISSING ITEM IN WORLD. NAME")
+    end
+
     for i = 1, #entities do
         local item = entities[i]
 

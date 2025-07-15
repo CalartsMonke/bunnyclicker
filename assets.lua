@@ -1,5 +1,8 @@
+local ripple = require 'lib.ripple'
+
 local assets =
 {
+
     images =
     {
         titlelogo = love.graphics.newImage('/img/titlelogo.png/'),
@@ -19,6 +22,7 @@ local assets =
         brownBrick = love.graphics.newImage('/img/brownbrick.png/'),
 
         slash1 = love.graphics.newImage('/img/slash1.png/'),
+        burning = love.graphics.newImage('img/statuseffects/burning.png'),
         bossKey = love.graphics.newImage('/img/bossKey.png/'),
         keyIcon = love.graphics.newImage('/img/keyIcon.png/'),
         keyIconDotted = love.graphics.newImage('/img/keyIconDotted.png/'),
@@ -46,6 +50,7 @@ local assets =
         projectiles =
         {
             brownBrick = love.graphics.newImage('/img/projectiles/proj_brownBrick.png/'),
+            smallBullet = love.graphics.newImage('/img/projectiles/smallBullet.png/'),
         },
 
         items = 
@@ -92,8 +97,16 @@ local assets =
 
     },
 
+    animations =
+    {
+
+
+    },
+
+
     sounds =
     {
+        
         bottlesmash1 = love.audio.newSource('/aud/bottlesmash1.mp3/', 'static'),
         bottlesmash2 = love.audio.newSource('/aud/bottlesmash2.mp3/', 'static'),
         gunshot1 = love.audio.newSource('/aud/gunshot1.mp3/', 'static'),
@@ -105,7 +118,8 @@ local assets =
         panaim = love.audio.newSource('aud/hitmark.mp3', 'static'),
         panhit = love.audio.newSource('aud/fryingpan.mp3/', 'static'),
         pancrit = love.audio.newSource('aud/pancrit.wav/', 'static'),
-        text1 = love.audio.newSource('aud/text1.wav/', 'static')
+        text1 = love.audio.newSource('aud/text1.wav/', 'static'),
+        hurt1 = ripple.newSound(love.audio.newSource('aud/hitHurt.wav', 'static')),
 
 
     },

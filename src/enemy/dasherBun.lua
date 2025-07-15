@@ -19,6 +19,7 @@ function enemyDasherBun:new(x, y)
 
     self.hpMax = 20
     self.hp = self.hpMax
+    self.prevHp = self.hp
     self.image = require('assets').images.enemies.dasherBun.dasherbun_idle
 
     self.STATES =
@@ -56,6 +57,7 @@ end
 function enemyDasherBun:update(dt)
 
 
+
     if self.state == self.STATES.DASHING then
         if self.triAlphaCurrent <= self.triAlphaMax then
         self.triAlphaCurrent = self.triAlphaCurrent + dt
@@ -72,6 +74,9 @@ function enemyDasherBun:update(dt)
     self:updateCollisionTriangle(dt)
     self:updatePlayingState()
     if self.isPlaying == true then
+
+        self:updateStatusEffects(dt)
+
         if self.state == self.STATES.IDLE then
             world:update(self, self.x, self.y)
             self.dashTimer = self.dashTimer - dt
@@ -133,7 +138,7 @@ end
 
 function enemyDasherBun:draw()
     if self.isPlaying == true then
-
+        self:drawStatusEffects()
         local offset = 0
         if self.dashTimer < self.dashTimerMax * 0.5 and self.state == self.STATES.IDLE then
             offset = (self.dashTimer - self.dashTimerMax + 2) * self.flip

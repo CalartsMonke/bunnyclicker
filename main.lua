@@ -3,6 +3,8 @@ love.math.setRandomSeed(love.timer.getTime())
 love.graphics.setDefaultFilter("nearest", "nearest")
 Object = require 'lib.classic'
 
+ripple = require 'lib.ripple'
+
 
 local text = require 'textbox'
 text.configure.audio_table(require'assets'.sounds)
@@ -157,6 +159,10 @@ function love.keypressed(key, scancode, isrepeat)
         love.mouse.setVisible(state)
      end
 
+     if key == 'r' then
+        love.event.quit('restart')
+     end
+
      --DUNGEON FUNCTIONS
      dungeon:keypressed(key, scancode, isrepeat)
 
@@ -166,12 +172,33 @@ function love.keypressed(key, scancode, isrepeat)
  --TITLE SCREEN
  state.title = {}
 
+local anim8 = require 'lib.anim8'
+local titlechoicePosX = 200
+local titlechoicePosY = 200
+state.title.choices = {
+    "START",
+    "OPTIONS (NOT IMPLMENTED)",
+    "EXIT",
+}
+state.title.titleYOff = 0
+state.title.showChoices = false
+state.title.choiceSelected = 1
+state.title.titleImage = require ('assets').images.titlelogo
+
+local g = anim8.newGrid(640, 720, state.title.titleImage:getWidth(), state.title.titleImage:getHeight())
+state.title.animation = anim8.newAnimation(g('1-2',1), 0.3)
+
+
+
  function state.title:enter(previous, ...)
      -- set up the level
  end
  
  function state.title:update(dt)
-     -- update entities
+    if self.showChoices then
+        flux.to(self, 1, {titleYOff = 360})
+    end
+    self.animation:update(dt)
  end
  
  function state.title:leave(next, ...)
@@ -179,21 +206,88 @@ function love.keypressed(key, scancode, isrepeat)
  end
  
  function state.title:draw()
-     love.graphics.draw(assets.images.titlelogo)
+
+
+
+     love.graphics.setCanvas({canvas, stencil=true})
+     love.graphics.clear()
+     canvas:setFilter("nearest")
+ 
+
+    self.animation:draw(self.titleImage, 0, self.titleYOff * -1)
+
+    if self.showChoices == true then
+        for i = 1, #self.choices do
+
+            if self.choiceSelected == i then
+                love.graphics.setColor(1, 1, 0)
+            else
+                love.graphics.setColor(1, 1, 1)
+            end
+
+            love.graphics.print(self.choices[i], titlechoicePosX, (titlechoicePosY + (i-1) * 32) - self.titleYOff + 360)
+
+            love.graphics.setColor(1, 1, 1)
+        end
+    end
+   --return canvas to normal
+   love.graphics.setCanvas()
+
+
+   love.graphics.setBlendMode("alpha", "premultiplied")
+   love.graphics.draw(canvas, love.graphics.getWidth() / 2, love.graphics.getHeight() / 2, 0, scale, scale, canvas:getWidth() / 2, canvas:getHeight() / 2)
+   love.graphics.setBlendMode("alpha")
  end
 
  function state.title:keypressed(key)
-    if key == 'space' then
-        rManager:enter(state.gameplay)
+
+    if self.showChoices == true then
+
+        if key == 'space' then
+            if self.choiceSelected == 1 then
+                rManager:enter(state.gameplay)
+            end
+            if self.choiceSelected == 2 then
+                rManager:enter(state.gameplay)
+            end
+            if self.choiceSelected == 3 then
+                love.event.quit()
+            end
+        end
+
+        if key == 'w' then
+            local sound = ripple.newSound(require'assets'.sounds.text1)
+            sound:play()
+            self.choiceSelected = self.choiceSelected - 1
+
+            if self.choiceSelected <= 0 then
+                self.choiceSelected = #self.choices
+            end
+        end
+
+        if key == 's' then
+            local sound = ripple.newSound(require'assets'.sounds.text1)
+            sound:play()
+            self.choiceSelected = self.choiceSelected + 1
+
+            if self.choiceSelected >= #self.choices + 1 then
+                self.choiceSelected = 1
+            end
+        end
+    else
+        if key == 'space' then
+            self.showChoices = true
+        end
     end
  end
 
+
+ local gameDrawAlpha = 0
 --GAMEPLAY
  state.gameplay = {}
 
  function state.gameplay:enter(previous, ...)
-     -- set up the level
-         --add enemies to list
+    gameDrawAlpha = 1
  end
  
  function state.gameplay:update(dt)
@@ -227,6 +321,10 @@ function love.keypressed(key, scancode, isrepeat)
 
     dungeon:update(dt)
     gameHud:update(dt)
+
+    if gameDrawAlpha > 0 then
+        gameDrawAlpha = gameDrawAlpha - dt
+    end
 
     
     
@@ -269,6 +367,13 @@ function love.keypressed(key, scancode, isrepeat)
         partTab[i]:draw()
     end
 
+    love.graphics.setColor(0, 0, 0, gameDrawAlpha)
+    love.graphics.rectangle('fill', 0, 0, 1000, 1000)
+    love.graphics.setColor(1, 1, 1, 1)
+
+    local fps = love.timer.getFPS()
+    love.graphics.print(fps)
+
     --return canvas to normal
     love.graphics.setCanvas()
 
@@ -276,4 +381,5 @@ function love.keypressed(key, scancode, isrepeat)
     love.graphics.setBlendMode("alpha", "premultiplied")
     love.graphics.draw(canvas, love.graphics.getWidth() / 2, love.graphics.getHeight() / 2, 0, scale, scale, canvas:getWidth() / 2, canvas:getHeight() / 2)
     love.graphics.setBlendMode("alpha")
+
  end

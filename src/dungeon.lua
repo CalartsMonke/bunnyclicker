@@ -295,12 +295,12 @@ function Dungeon:draw()
                 local cx, cy = self:ConvertPositionToCell(mx, my)
 
                 love.graphics.setColor(1, 1, 1, 0.2)
-                love.graphics.circle('fill', cx + 16, cy + 16, 10)
+                --love.graphics.circle('fill', cx + 16, cy + 16, 10)
                 for i = 1, 14 do
-                    love.graphics.line(csx + (i-1) * self.cellWidth, csy, csx + (i-1) * self.cellWidth, (self.cellHeight * self.cellsVertical) + self.cellStartY)
+                   -- love.graphics.line(csx + (i-1) * self.cellWidth, csy, csx + (i-1) * self.cellWidth, (self.cellHeight * self.cellsVertical) + self.cellStartY)
                 end
                 for  i = 1, 10 do
-                    love.graphics.line(csx, csy + (i-1) * self.cellHeight, self.cellStartX + self.cellsHorizontal * self.cellWidth , csy + (i-1) * self.cellHeight)
+                    --love.graphics.line(csx, csy + (i-1) * self.cellHeight, self.cellStartX + self.cellsHorizontal * self.cellWidth , csy + (i-1) * self.cellHeight)
                 end
                 love.graphics.setColor(1, 1, 1, 1)
 

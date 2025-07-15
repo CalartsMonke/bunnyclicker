@@ -22,6 +22,9 @@ function WeaponIronPan:new()
 
     self.state = 1
 
+    self.deathTimer = 0.2
+    self.isDying = false
+
     self.hitBars = {}
     self.barsLeft = 4
     self.barHeight = 16
@@ -35,6 +38,14 @@ end
 function WeaponIronPan:update(dt)
     self:UpdateBars(dt)
     if self.currentBarNumber > 4 then
+        self.isDying = true
+    end
+
+    if self.isDying == true then
+        self.deathTimer = self.deathTimer - dt
+    end
+
+    if self.deathTimer <= 0 then
         self.state = 3
     end
 end
@@ -92,6 +103,8 @@ function WeaponIronPan:MakeBar(x)
             bar.drawAlpha = bar.drawAlpha - 2 * dt
             bar.deathTime = bar.deathTime - dt
         end
+
+
 
         
     end

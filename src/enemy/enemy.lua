@@ -27,6 +27,7 @@ function Enemy:new(x, y)
 
     self.hpMax = 30
     self.hp = self.hpMax
+    self.prevHp = self.hp
     self.state = self.STATES.ACTIVE
     self.isPlaying = false
     self.isBoss = false
@@ -78,6 +79,32 @@ function Enemy:drawCollisionTriangle()
 
 end
 
+function Enemy:updateStatusEffects(dt)
+    for i=#self.statusEffects, 1, -1 do
+        local status = self.statusEffects[i]
+
+        status:update(dt)
+
+        if status.timer <= 0 then
+            table.remove(self.statusEffects, i)
+        end
+    end
+end
+
+function Enemy:drawStatusEffects()
+
+    for i=#self.statusEffects, 1, -1 do
+        local status = self.statusEffects[i]
+
+        status:draw()
+        love.graphics.print(status.timer, self.x, self.y - 50)
+    end
+end
+
+function Enemy:AddToStatusEffects(status)
+    table.insert(self.statusEffects, status)
+end
+
 function Enemy:TakeDamage(damage, aggrotoadd)
     if self.state ~= self.STATES.NONE or self.STATES.DEAD then
         self.hp = self.hp - damage
@@ -113,10 +140,25 @@ function Enemy:updatePlayingState()
     else
         self.isPlaying = false
     end
+
+    if self.isPlaying == true then
+        --just some extras that are forced to be in other enemys
+        if self.prevHp ~= self.hp then
+            if self.prevHp > self.hp then
+                local sound = require'assets'.sounds.hurt1
+                local playedSound = sound:play{volume = .5, pitch = 3}
+            end
+        end
+
+
+
+        self.prevHp = self.hp
+
+    end
 end
 
 function Enemy:update(dt)
-    
+
 end
 
 function Enemy:draw()
