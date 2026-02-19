@@ -27,7 +27,6 @@ function StatusBurning:update(dt)
         self.triggerRate = self.triggerRateMax
     end
 
-    print("BURNING BURNING I AM BURNING")
     self.timer = self.timer - dt
 end
 

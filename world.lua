@@ -1,4 +1,5 @@
-local bump = require 'lib.bump'
-local world = bump.newWorld()
+local phys = require 'physics'
+
+local world = phys.newWorld(0, 0)
 
 return world

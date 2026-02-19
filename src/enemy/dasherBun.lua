@@ -7,17 +7,74 @@ local game = require 'gameStats'
 
 --bullet
 local Bullet = require 'src.bullet'
+local enemyid = require 'src.enemyid'
+local physics = require 'physics'
+
+
+
+
+
+
+--MAKE ATTACK REF FUNCTIONS
+local TriBulletsAtSides = function(self, dt)
+    if self.delayUntillNextAttack <= 0 then
+        self.funvar1 = self.funvar1 + 1
+        self.delayUntillNextAttack = self.delayUntillNextAttackMax
+
+        local bulletImage = require 'assets'.images.projectiles.whiteBullet
+
+        local angle = 0
+
+        if self.funvar1 == 1 then
+            angle = 0
+            print(angle)
+        end
+        if self.funvar1 == 2 then
+            angle = 90
+            print(angle)
+        end
+        if self.funvar1 == 3 then
+            angle = 180
+            print(angle)
+        end
+        if self.funvar1 == 4 then
+            angle = 270
+            print(angle)
+        end
+        local battleBoxCenX = _G.battlebox.x + (_G.battlebox.width/2)
+        local battleBoxCenY = _G.battlebox.y + (_G.battlebox.height/2)
+
+        local newX = battleBoxCenX + math.cos(math.rad(angle)) * 130
+        local newY = battleBoxCenY + math.sin(math.rad(angle)) * 130
+        local attackAngle = angle + 180
+
+        self:createBullet(newX - 8, newY - 8, math.rad(attackAngle), bulletImage)
+        self:createBullet(newX - 8, newY - 8, math.rad(attackAngle + 10), bulletImage)
+        self:createBullet(newX - 8, newY - 8, math.rad(attackAngle - 10), bulletImage)
+
+        if self.funvar1 >= 4 then
+            self.funvar1 = 1
+        end
+        
+    end
+end
+local focusattacks = require 'src.attacks'
 
 enemyDasherBun = Enemy:extend()
 
-
-
-function enemyDasherBun:new(x, y)
+function enemyDasherBun:new(x, y, params)
     self.super.new(self,x,y)
     self.type = 'EnemyDasherBun'
     self:addToTags("EnemyDasherBun")
+    self.ENEMYNAME = "DASHERBUN"
+    self.enemyid = enemyid.dasherbun
 
-    self.hpMax = 20
+    self.bulletX = params.bulletX or 0
+    self.bulletY = params.bulletY or 0
+    self.fieldX = x
+    self.fieldY = y
+
+    self.hpMax = 80
     self.hp = self.hpMax
     self.prevHp = self.hp
     self.image = require('assets').images.enemies.dasherBun.dasherbun_idle
@@ -29,7 +86,9 @@ function enemyDasherBun:new(x, y)
        DEAD = 3,
        IDLE = 4,
        DASHING = 5,
+       ATTACKING = 6,
     }
+    self.fieldMode = true
     self.speedMax = 225
     self.speed = self.speedMax
     self.dashTimer = 6
@@ -39,25 +98,34 @@ function enemyDasherBun:new(x, y)
     self.flip = 1
     self.flipTimer = 0.1
     self.xScale = 1
+    self.playerTarget = nil
+
+    self.attackStat = 5
+    self.defenseStat = 0
 
     self:addToGame(self.image, x, y)
+    self.shape:setSensor(true)
+
+    self.attacks = {
+        {attack = focusattacks.TriBulletsAtSides, owner = self, name = "EpicAttack1"},
+        {attack = focusattacks.TriBulletsAtSides2, owner = self, name = "EpicAttack2"},
+    }
 end
 
-local filter = function(item, other)
-    if not item:is(Player) then
-        return 'cross'
-    end
+function enemyDasherBun:returnToField()
 
-    if item:is(Player) then
-        return 'cross'
-    end
 end
 
+function enemyDasherBun:focusAttack(dt)
+
+end
 
 function enemyDasherBun:update(dt)
 
+    local dX, dY = 0, 0
 
-
+    self:updateCollisionTriangle(dt)
+    self:updatePlayingState(dt)
     if self.state == self.STATES.DASHING then
         if self.triAlphaCurrent <= self.triAlphaMax then
         self.triAlphaCurrent = self.triAlphaCurrent + dt
@@ -68,18 +136,21 @@ function enemyDasherBun:update(dt)
         end
     end
 
-
-
-
-    self:updateCollisionTriangle(dt)
-    self:updatePlayingState()
     if self.isPlaying == true then
-
         self:updateStatusEffects(dt)
 
+        if self.body:isAwake() then
+            print("AWAKE")
+        else
+            print("Snore mimimi")
+        end
+        self.body:setAwake(true)
         if self.state == self.STATES.IDLE then
-            world:update(self, self.x, self.y)
             self.dashTimer = self.dashTimer - dt
+
+
+             dX = 0
+             dY = 0
 
             if self.dashTimer <= 0 then
                 self.state = self.STATES.DASHING
@@ -99,45 +170,50 @@ function enemyDasherBun:update(dt)
             self.speed = self.speed - 150 * dt
 
             if self.speed <= 0 then
-                print("THIS IS RUNNING CORRECTLY")
                 self.dashTimer = self.dashTimerMax
                 self.state = self.STATES.IDLE
             end
 
-            local newX = math.cos((angle or 10)) * self.speed * dt
-            local newY = math.sin((angle or 10)) * self.speed * dt
+            dX = math.cos((angle or 10)) * self.speed
+            dY = math.sin((angle or 10)) * self.speed
 
             local cols, len
-            self.x, self.y, cols, len = self.world:move(self, self.x + newX, self.y + newY, filter) --idk why this don't work
-            --cols, len = self.world:queryRect(self.x, self.y, 16, 16)
-    
-            for i=1, len do
-                local col = cols[i]
-                local item = col.other
-    
-                if col.other:is(Player) then
-                    if col.other.invicbility <= 0 then
-                        col.other:TakeDamage(1)
-                    end
+                    --MOVE
+            self.body:setInertia(0)
+            self.shape:setFriction(0)
+
+            if self.playerTarget ~= nil then
+                if self.playerTarget.invicbility <= 0 then
+                    self.playerTarget:TakeDamage(self.attackStat)
                 end
             end
         end
-        if self.hp <= 0 then
-            self:Die()
-        end
-
         self.flipTimer = self.flipTimer - dt
         if self.flipTimer <= 0 then
             self.flip = self.flip * -1
             self.flipTimer = 0.05
         end
 
-
+        if self.fieldMode == true then
+            self.body:setLinearVelocity(dX, dY)
+            local px, py = self.body:getPosition()
+            self.fieldX, self.fieldY = px, py
+            self.x, self.y = px, py
+        else
+            self.x = self.bulletX
+            self.y = self.bulletY
+            self.body:setX(self.x)
+            self.body:setY(self.y)
+        end
     end
 end
 
 function enemyDasherBun:draw()
+    physics.draw_body(self.body)
     if self.isPlaying == true then
+
+        love.graphics.print(self.x, self.x, self.y - 16)
+        love.graphics.print(self.y, self.x + 32, self.y - 16)
         self:drawStatusEffects()
         local offset = 0
         if self.dashTimer < self.dashTimerMax * 0.5 and self.state == self.STATES.IDLE then
@@ -146,7 +222,7 @@ function enemyDasherBun:draw()
             offset = 0
         end
 
-        if self.state == self.STATES.IDLE then
+        if self.state == self.STATES.IDLE or self.state == self.STATES.ATTACKING then
             self.image = require 'assets'.images.enemies.dasherBun.dasherbun_idle
         end
         if self.state == self.STATES.DASHING then
@@ -163,14 +239,70 @@ function enemyDasherBun:draw()
         else
             originOffset = self.image:getWidth()
         end
-
+        love.graphics.setColor(1, 1, 1, self.drawAlpha)
         love.graphics.draw(self.image, self.x + (offset), self.y, 0, self.xScale, 1, originOffset, 0)
-        love.graphics.print(tostring(self.hp), self.x + 5, self.y - 18)
-        love.graphics.print(self.bulletTimer, self.x + 5, self.y - 32)
-        love.graphics.print(self.state, self.x + 20, self.y - 50)
+        love.graphics.setColor(1, 1, 1, 1)
 
-        self:drawDebugHitbox()
+
+
+
+        --self:drawDebugHitbox()
     end
+
+
+end
+
+
+function enemyDasherBun.on_collision_start(self, other, normal_x, normal_y, x1, y1, x2, y2)
+    if self.isPlaying == true then
+        -- handler logic here, 
+        local body_a = self:get_body() -- love.physics.Body
+        local body_b = other:get_body() -- love.physics.Body
+        local ax, ay = body_a:getPosition()
+        local bx, by = body_b:getPosition()
+
+        print("SOMETHING ENTERED COLLISION")
+        if other.is then
+            if other:is(Player) then
+                self.playerTarget = other
+            end
+        end
+    end
+
+end
+
+function enemyDasherBun.on_collision_exit(self, other, normal_x, normal_y, x1, y1, x2, y2)
+    if self.isPlaying == true then
+        -- handler logic here, 
+        local body_a = self:get_body() -- love.physics.Body
+        local body_b = other:get_body() -- love.physics.Body
+        local ax, ay = body_a:getPosition()
+        local bx, by = body_b:getPosition()
+
+        if other == self.playerTarget or other:is(Player) then
+            print("AWESOME")
+            self.playerTarget = nil
+        end
+    end
+
+end
+
+function enemyDasherBun:collision_presolve(other, normal_x, normal_y, x1, y1, x2, y2)
+    -- handler logic here, 
+    local body_a = self:get_body() -- love.physics.Body
+    local body_b = other:get_body() -- love.physics.Body
+    local ax, ay = body_a:getPosition()
+    local bx, by = body_b:getPosition()
+
+end
+
+function enemyDasherBun:collision_postsolve(other, normal_x, normal_y, x1, y1, x2, y2)
+    -- handler logic here, 
+    local body_a = self:get_body() -- love.physics.Body
+    local body_b = other:get_body() -- love.physics.Body
+    local ax, ay = body_a:getPosition()
+    local bx, by = body_b:getPosition()
+
 end
 
 

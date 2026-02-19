@@ -4,7 +4,31 @@ love.graphics.setDefaultFilter("nearest", "nearest")
 Object = require 'lib.classic'
 
 ripple = require 'lib.ripple'
+sti = require 'lib.sti'
 
+_G.debug = true --TODO REMOVE AT GAMERELEASE
+
+
+--PLACE ROOM MAKING CODE BACK HERE IF IT DOESNT WORK
+
+
+local baton = require 'lib.baton'
+
+_G.battleBox = require 'src.battlebox'
+
+local inputControls = {
+    left = {'key:left', 'key:a', 'axis:leftx-', 'button:dpleft'},
+    right =  {'key:right', 'key:d', 'axis:leftx+', 'button:dpright'},
+    up = {'key:up', 'key:w', 'axis:lefty-', 'button:dpup'},
+    down = {'key:down', 'key:s', 'axis:lefty+', 'button:dpdown'},
+    attack = {'mouse:1', 'key:z', 'button:a'},
+    subweapon = {'mouse:2', 'key:x', 'button:rightshoulder'},
+    heal = {'key:c', 'mouse:3', 'mouse:4', 'button:leftshoulder'},
+}
+input = baton.new {
+    controls = inputControls,
+    joystick = love.joystick.getJoysticks()[1],
+}
 
 local text = require 'textbox'
 text.configure.audio_table(require'assets'.sounds)
@@ -25,16 +49,33 @@ local textTextbox = text.new('center',{
 flux = require 'lib.flux'
 local roomy = require 'lib.roomy'
 
-love.hasDeprecationOutput('false')
+local bool = false
+love.setDeprecationOutput(bool)
 local world = require 'world'
 local assets = require 'assets'
 local Enemy = require 'src.enemy.enemy'
 
+
+local battlemanager = require 'src.battlemanager'
+_G.battlemanager = battlemanager
+_G.bulletspawner = require 'src.bulletspawner'
+_G.battlebox = require 'src.battlebox'
+local prevMx, prevMy = 0, 0
 local game = require 'gameStats'
 _G.game = game
 
 
-local rManager = require 'lib.roomy'.new()
+local player = game.player
+local worldPlayer = require'src.playerOverworld'(100, 32*8)
+_G.player = player
+_G.worldPlayer = worldPlayer
+
+rManager = require 'lib.roomy'.new()
+local testRoom = require 'src.rooms.test.testroom_01'
+local battletestRoom = require 'src.rooms.battletestroom_01'
+
+
+currentRoom = testRoom
 
 local debugChart = require 'src.debugchart'
 
@@ -62,9 +103,10 @@ _G.gameHud = gameHud
 
 local entities = require 'roomEntities'
 
-local player = game.player
-_G.player = player
-table.insert(entities, player)
+
+--table.insert(entities, player)
+--table.insert(entities, worldPlayer)
+
 
 
 
@@ -106,6 +148,7 @@ function love.load()
     rManager:hook()
     rManager:enter(state.title)
 
+
 end
 
 function love.mousepressed(x, y, button, istouch)
@@ -121,7 +164,9 @@ function love.mousepressed(x, y, button, istouch)
  end
 
 function love.update(dt)
+
     flux.update(dt)
+    input:update(dt)
 
     --update particle table
     local partTab = partTable
@@ -164,7 +209,7 @@ function love.keypressed(key, scancode, isrepeat)
      end
 
      --DUNGEON FUNCTIONS
-     dungeon:keypressed(key, scancode, isrepeat)
+     --dungeon:keypressed(key, scancode, isrepeat)
 
      player:keypressed(key, scancode, isrepeat)
  end
@@ -288,6 +333,7 @@ state.title.animation = anim8.newAnimation(g('1-2',1), 0.3)
 
  function state.gameplay:enter(previous, ...)
     gameDrawAlpha = 1
+    currentRoom:enter()
  end
  
  function state.gameplay:update(dt)
@@ -311,15 +357,15 @@ state.title.animation = anim8.newAnimation(g('1-2',1), 0.3)
         boxcheck = 'YOU ARE NOT IN BOX'
         player.insideBox = true
     end
+    
+    --player.x = player.x + (mx- prevMx)
+    --player.y = player.y + (my - prevMy)
+    player.mx = mx
+    player.my = my
 
 
-    local worldItems, worldLen = world:getItems()
-    for i = 1, worldLen do
-        local item = worldItems[i]
-
-    end
-
-    dungeon:update(dt)
+    world:update(dt)
+    currentRoom:update(dt)
     gameHud:update(dt)
 
     if gameDrawAlpha > 0 then
@@ -329,8 +375,11 @@ state.title.animation = anim8.newAnimation(g('1-2',1), 0.3)
     
     
     --Update player
-    player.x = mx - player.mOffX/2
-    player.y = my - player.mOffY/2
+    --player.x = mx - player.mOffX/2
+    --player.y = my - player.mOffY/2
+
+    prevMx = mx
+    prevMy = my
  
     local playerx = tostring(player.x)
     local playery = tostring(player.y)
@@ -353,14 +402,10 @@ state.title.animation = anim8.newAnimation(g('1-2',1), 0.3)
       love.graphics.setCanvas({canvas, stencil=true})
       love.graphics.clear()
       canvas:setFilter("nearest")
-  
-  
-      --draw debug chart
-     -- debugChart:DrawDebugMessage(10, 10, 0, 16)
-  
-    dungeon:draw()
-    gameHud:draw()
 
+
+    currentRoom:draw()
+    
     --Draw particles
     local partTab = partTable
     for i = 1, #partTab do
@@ -383,3 +428,106 @@ state.title.animation = anim8.newAnimation(g('1-2',1), 0.3)
     love.graphics.setBlendMode("alpha")
 
  end
+
+
+
+ --COLLISION CALLBACKS
+
+ local on_collision_start_handler = function(shape_a, shape_b, contact)
+    local normal_x, normal_y = contact:getNormal()
+    local x1, y1, x2, y2 = contact:getPositions()
+    local object_a = shape_a:getUserData()
+    local object_b = shape_b:getUserData()
+
+    if object_a == nil or object_b == nil then
+
+        print("A OBJECT NOT FOUND, ADD THEIR USER DATA")
+         return
+
+    end -- no userdata
+
+    if object_a.on_collision_start ~= nil then
+        assert(type(object_a.on_collision_start) == "function")
+        object_a.on_collision_start(object_a, object_b, normal_x, normal_y, x1, y1, x2, y2)
+    end
+
+    if object_b.on_collision_start ~= nil then
+        assert(type(object_b.on_collision_start) == "function")
+        object_b.on_collision_start(object_b, object_a, normal_x, normal_y, x1, y1, x2, y2)
+    end
+end
+
+local on_collision_exit_handler = function(shape_a, shape_b, contact)
+    local normal_x, normal_y = contact:getNormal()
+    local x1, y1, x2, y2 = contact:getPositions()
+    local object_a = shape_a:getUserData()
+    local object_b = shape_b:getUserData()
+
+    if object_a == nil or object_b == nil then
+
+        print("A OBJECT NOT FOUND, ADD THEIR USER DATA")
+         return
+
+    end -- no userdata
+
+    if object_a.on_collision_exit ~= nil then
+        assert(type(object_a.on_collision_exit) == "function")
+        object_a.on_collision_exit(object_a, object_b, normal_x, normal_y, x1, y1, x2, y2)
+    end
+
+    if object_b.on_collision_exit ~= nil then
+        assert(type(object_b.on_collision_exit) == "function")
+        object_b.on_collision_exit(object_b, object_a, normal_x, normal_y, x1, y1, x2, y2)
+    end
+end
+
+local collision_presolve_handler = function(shape_a, shape_b, contact)
+    local normal_x, normal_y = contact:getNormal()
+    local x1, y1, x2, y2 = contact:getPositions()
+    local object_a = shape_a:getUserData()
+    local object_b = shape_b:getUserData()
+
+    if object_a == nil or object_b == nil then
+
+        print("A OBJECT NOT FOUND, ADD THEIR USER DATA")
+         return
+
+    end -- no userdata
+
+    if object_a.collision_presolve ~= nil then
+        assert(type(object_a.collision_presolve) == "function")
+        object_a.collision_presolve(object_a, object_b, normal_x, normal_y, x1, y1, x2, y2)
+    end
+
+    if object_b.collision_presolve ~= nil then
+        assert(type(object_b.collision_presolve) == "function")
+        object_b.collision_presolve(object_b, object_a, normal_x, normal_y, x1, y1, x2, y2)
+    end
+end
+
+local collision_postsolve_handler = function(shape_a, shape_b, contact, normalimpulse, tangentimpulse)
+    local normal_x, normal_y = contact:getNormal()
+    local x1, y1, x2, y2 = contact:getPositions()
+    local object_a = shape_a:getUserData()
+    local object_b = shape_b:getUserData()
+
+    if object_a == nil or object_b == nil then
+
+        print("A OBJECT NOT FOUND, ADD THEIR USER DATA")
+         return
+
+    end -- no userdata
+
+    if object_a.collision_postsolve ~= nil then
+        assert(type(object_a.collision_postsolve) == "function")
+        object_a.collision_postsolve(object_a, object_b, normal_x, normal_y, x1, y1, x2, y2)
+    end
+
+    if object_b.collision_postsolve ~= nil then
+        assert(type(object_b.collision_postsolve) == "function")
+        object_b.collision_postsolve(object_b, object_a, normal_x, normal_y, x1, y1, x2, y2)
+    end
+end
+
+world:setCallbacks(on_collision_start_handler, on_collision_exit_handler, collision_presolve_handler, collision_postsolve_handler)
+

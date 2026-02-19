@@ -40,7 +40,6 @@ end
 function BagDrop:collect()
     if self.isActive == true then
     self.state = self.states[2]
-    print("THIS ITEM WAS COLLECTED AND IS A COIN BAG")
     end
 end
 

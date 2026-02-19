@@ -1,6 +1,9 @@
 local entities = require('roomEntities')
 Entity = Object:extend()
 
+local world = require 'world'
+local physics = require 'physics'
+
 function Entity:new(x, y)
     self.x = x
     self.y = y
@@ -8,18 +11,25 @@ end
 
 function Entity:addToGame(image, x, y, w, h)
     self.type = "Entity"
-    self.image = image
+    self.image = image or nil
     self.x = x or 100
     self.y = y or 100
     self.width = self.image:getWidth() or w
     self.height = self.image:getHeight() or h
     self.world = require('world')
 
+    self.image_angle = 0
+    self.direction = 0
+    if self.speed == nil then
+        self.speed = 0
+    end
+
     if self:is(Enemy) then
         self.statusEffects = {}
     end
 
-    self.world:add(self, self.x, self.y, self.width, self.height)
+    self.body, self.shape = physics.new_rectangle_collider(world, 'dynamic', self.x, self.y, self.width or 16, self.height or 16)
+    self.shape:setUserData(self)
 end
 
 function Entity:update()
@@ -28,6 +38,10 @@ end
 
 function Entity:draw()
 
+end
+
+function Entity:changeImage(image)
+    self.image = image
 end
 
 function Entity:addToTags(tag)
@@ -81,9 +95,9 @@ function Entity:getNearestObjectInCircle(radius, tag, x, y)
     local sx, sy = self:getCenter()
     local items, len = self.world:queryRect(sx - radius, sy - radius, radius *2.5, radius * 2.5)
 
-    closestItem = nil
+    local closestItem = nil
     for i=1, len do
-        item = items[i]
+        local item = items[i]
         if item ~= self then
             if item.isActive == true or item.isPlaying == true then
                 if item:hasTag(tag) then
@@ -111,25 +125,32 @@ function Entity:BossDefeat()
 end
 
 function Entity:drawDebugHitbox()
-    local x,y,w,h = self.world:getRect(self)
-    love.graphics.setColor(0,1,0)
-    love.graphics.rectangle('line', x, y, w, h)
-    love.graphics.setColor(1,1,1)
+
+    if require 'world':hasItem(self) then
+        local x,y,w,h = self.world:getRect(self)
+        love.graphics.setColor(0,1,0)
+        love.graphics.rectangle('line', x, y, w, h)
+        love.graphics.setColor(1,1,1)
+    else
+
+    end
 end
 
 function Entity:Destroy()
 
     if require 'world':hasItem(self) then
         require 'world':remove(self)
+        local type = self.type or "NO TYPE FOUND"
+        print("DELETED ITEM FROM WORLD: "..type)
     else
-        print("MISSING ITEM IN WORLD. NAME")
+        print("MISSING ITEM IN WORLD: "..self.type)
     end
 
-    for i = 1, #entities do
-        local item = entities[i]
+    for i = #currentRoom.roomObjects, 1, -1 do
+        local item = currentRoom.roomObjects[i]
 
         if item == self then
-            table.remove(entities, i)
+            table.remove(currentRoom.roomObjects)
         end
     end
 end
@@ -137,6 +158,51 @@ end
 function Entity:getCenter()
     return self.x + self.width / 2,
             self.y + self.height / 2
+end
+
+function Entity.get_shape(item)
+    return item.shape
+end
+
+
+function Entity.get_body(item)
+    return item.body
+end
+
+function Entity.on_collision_start(self, other, normal_x, normal_y, x1, y1, x2, y2)
+    -- handler logic here, 
+    local body_a = self:get_body() -- love.physics.Body
+    local body_b = other:get_body() -- love.physics.Body
+    local ax, ay = body_a:getPosition()
+    local bx, by = body_b:getPosition()
+
+end
+
+function Entity.on_collision_exit(self, other, normal_x, normal_y, x1, y1, x2, y2)
+    -- handler logic here, 
+    local body_a = self:get_body() -- love.physics.Body
+    local body_b = other:get_body() -- love.physics.Body
+    local ax, ay = body_a:getPosition()
+    local bx, by = body_b:getPosition()
+
+end
+
+function Entity:collision_presolve(other, normal_x, normal_y, x1, y1, x2, y2)
+    -- handler logic here, 
+    local body_a = self:get_body() -- love.physics.Body
+    local body_b = other:get_body() -- love.physics.Body
+    local ax, ay = body_a:getPosition()
+    local bx, by = body_b:getPosition()
+
+end
+
+function Entity:collision_postsolve(other, normal_x, normal_y, x1, y1, x2, y2)
+    -- handler logic here, 
+    local body_a = self:get_body() -- love.physics.Body
+    local body_b = other:get_body() -- love.physics.Body
+    local ax, ay = body_a:getPosition()
+    local bx, by = body_b:getPosition()
+
 end
 
 return Entity

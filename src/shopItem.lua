@@ -25,7 +25,6 @@ end
 function shopItem:decreaseAlpha(dt)
     if self.displayAlpha > 0 then
     self.displayAlpha = self.displayAlpha - dt
-    print(self.displayAlpha)
     end
 end
 

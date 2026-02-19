@@ -20,7 +20,6 @@ function Particlestation:decreaseLife(dt)
         for i = 1, #partTable do
             local tab = partTable
             if tab[i] == self then
-                print('FOUND THE PART SYSTEM')
                 table.remove(tab, i)
             end
         end

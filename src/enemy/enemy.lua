@@ -1,7 +1,9 @@
 local entity = require 'src.entity'
 local world = require 'world'
 local game = require 'gameStats'
-
+local floatingNumber = require 'src.floatingDamageNumber'
+local color = require 'colors'
+local battlemanager = require 'src.battlemanager'
 --bullet
 local Bullet = require 'src.bullet'
 Enemy = entity:extend()
@@ -11,10 +13,13 @@ Enemy = entity:extend()
 function Enemy:new(x, y)
     self.x = x or 100
     self.y = y or 100
+    self.battleX = x
+    self.battleY = y
     self.width = 32
     self.height = 32
     self.type = "Enemy"
     self:addToTags("Enemy")
+    self.drawAlpha = 1
 
     self.STATES =
  {
@@ -125,20 +130,29 @@ function Enemy:Die()
         local heartDrop = require 'src.collectible.heartDrop'
         local chance = love.math.random(0, 2)
 
-        if chance == 1 then
-        local Coin = coinDrop(self.x, self.y)
-        end
-        --local Heart = heartDrop(self.x, self.y)
+
         self.state = self.STATES.DEAD
-        self:Destroy()
+        local direction = love.math.random(0, 360)
+        self.deathMoveDirection = direction
+        self.deathMoveSpeed = 600
+        local deathSound = require 'assets'.sounds.smash
+        deathSound:play()
+        deathSound.volume = 1.4
+        --self:Destroy()
     end
 end
 
-function Enemy:updatePlayingState()
-    if self.state ~= self.STATES.NONE and self.state ~= self.STATES.DEAD then
+function Enemy:updatePlayingState(dt)
+    if self.state ~= self.STATES.NONE then
         self.isPlaying = true
     else
         self.isPlaying = false
+    end
+
+    if self.state ~= self.STATES.DEAD then
+        if self.hp <= 0 then
+            self:Die()
+        end
     end
 
     if self.isPlaying == true then
@@ -146,7 +160,12 @@ function Enemy:updatePlayingState()
         if self.prevHp ~= self.hp then
             if self.prevHp > self.hp then
                 local sound = require'assets'.sounds.hurt1
-                local playedSound = sound:play{volume = .5, pitch = 3}
+                local playedSound = sound:play{volume = 1, pitch = 1}
+
+                local number = floatingNumber.new(self.prevHp - self.hp, self.x + 8, self.y - 2, color.bunnyblue)
+                table.insert(battlemanager.floatingNumbers, number)
+
+                self.isHurt = true
             end
         end
 
@@ -154,6 +173,19 @@ function Enemy:updatePlayingState()
 
         self.prevHp = self.hp
 
+    end
+
+    if self.state == self.STATES.DEAD then
+        local angle = self.deathMoveDirection
+        local speed = self.deathMoveSpeed
+
+        local newX = math.cos((angle or 10)) * speed * dt
+        local newY = math.sin((angle or 10)) * speed * dt
+
+        self.x = self.x + newX
+        self.y = self.y + newY
+    
+        self.drawAlpha = self.drawAlpha - dt * 3
     end
 end
 

@@ -16,10 +16,14 @@ function enemyHorizontal:new(x, y)
     self.super.new(self,x,y)
     self.addToTags{"enemyHorizontal"}
     self.type = "EnemyHorizontal"
+    self.ENEMYNAME = "TALKERBUN"
     self.image = require('assets').images.enemies.talkerBun.talkerbun_idle
+    self.isPlaying = true
 
     self.prevHp = self.hp
     self:addToGame(self.image, x, y)
+
+
 end
 
 
@@ -27,12 +31,9 @@ function enemyHorizontal:update(dt)
 
     
     world:update(self, self.x, self.y)
-    self:updatePlayingState()
+    self:updatePlayingState(dt)
     if self.isPlaying == true then
         self:updateStatusEffects(dt)
-        if self.hp <= 0 then
-            self:Die()
-        end
 
 
         --aggro decrease
@@ -51,10 +52,10 @@ end
 function enemyHorizontal:draw()
     if self.isPlaying == true then
         self:drawStatusEffects()
+
+        love.graphics.setColor(1, 1, 1, self.drawAlpha)
         love.graphics.draw(self.image, self.x, self.y, 0, 1, 1)
-        love.graphics.print(tostring(self.hp), self.x + 5, self.y - 18)
-        --love.graphics.print(self.bulletTimer, self.x + 5, self.y - 32)
-        --love.graphics.print(self.state, self.x + 20, self.y - 50)
+        love.graphics.setColor(1, 1, 1, 1)
 
         local x,y,w,h = self.world:getRect(self)
         love.graphics.setColor(0,1,0)

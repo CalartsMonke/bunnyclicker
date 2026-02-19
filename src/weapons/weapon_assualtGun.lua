@@ -7,7 +7,7 @@ local sparklePart = require 'src.part.sparklepart'
 WeaponAssualtGun = weapon:extend()
 
 function WeaponAssualtGun:new()
-    self.damage = 14
+    self.damage = 18
     self.delay = 0
     self.delayMax = 0.05
     self.uses = 1
@@ -19,6 +19,7 @@ function WeaponAssualtGun:new()
     self.level1Aim = 40
     self.level2Aim = 20
     self.level3Aim = 10
+
     self.missAim = 5
     self.isDying = false
     self.deathTimer = 0.5
@@ -29,6 +30,10 @@ function WeaponAssualtGun:new()
     self.amountToDecrease = 2
     self.decreasingRadius = false
     self.started = false
+
+    self.level1ChargeCost = 125
+    self.level2ChargeCost = 225
+    self.level3ChargeCost = 250
 end
 
 function WeaponAssualtGun:update(dt)
@@ -56,10 +61,6 @@ function WeaponAssualtGun:update(dt)
             self.flipTimer = self.flipTimerMax
         end
 
-
-        if self.deathTimer <= 0 then
-            self.uses = self.uses - 1
-        end
     end
 end
 
@@ -115,12 +116,22 @@ function WeaponAssualtGun:ActionLevel3()
 end
 
 
-function WeaponAssualtGun:use(owner, target)
+function WeaponAssualtGun:use(owner, target, level)
     if self.started ~= true then
         self.target = target
-        self.decreasingRadius = true
+        --self.decreasingRadius = true
 
-        self.started = true
+        --self.started = true
+
+        if level == 1 then
+            self:ActionLevel1()
+        end
+        if level == 2 then
+            self:ActionLevel2()
+        end
+        if level == 3 then
+            self:ActionLevel3()
+        end
     
         return true
     end
@@ -135,29 +146,31 @@ function WeaponAssualtGun:draw()
 
         love.graphics.setColor(1, 0, 1, 0.4)
         for i=self.level1Aim, self.level2Aim, -2 do
-            love.graphics.circle('line', _G.player.x, _G.player.y - 48, i)
+            --love.graphics.circle('line', _G.player.x, _G.player.y - 48, i)
         end
         love.graphics.setColor(1, 1, 0, 0.4)
         for i=self.level2Aim, self.level3Aim, -2 do
-            love.graphics.circle('line', _G.player.x, _G.player.y - 48, i)
+            --love.graphics.circle('line', _G.player.x, _G.player.y - 48, i)
         end
         love.graphics.setColor(1, 0, 0, 0.4)
         for i=self.level3Aim, self.missAim, -2 do
-            love.graphics.circle('line', _G.player.x, _G.player.y - 48, i)
+            --love.graphics.circle('line', _G.player.x, _G.player.y - 48, i)
         end
 
 
         local circleAlpha = 60 - (self.aimRadius)
 
         if self.flipTimer > self.flipTimerMax / 2 then
-            love.graphics.setColor(1, 1, 1, circleAlpha / 100)
+            --love.graphics.setColor(1, 1, 1, circleAlpha / 100)
         else
-            love.graphics.setColor(0.3, 0.3, 0.3, 1)
+            --love.graphics.setColor(0.3, 0.3, 0.3, 1)
         end
 
         for i = self.aimRadius -2, self.aimRadius + 2 do
-            love.graphics.circle('line', _G.player.x, _G.player.y - 48, self.aimRadius)
+            --love.graphics.circle('line', _G.player.x, _G.player.y - 48, self.aimRadius)
         end
+
+        love.graphics.setColor(1,1,1,1)
     end
 end
 

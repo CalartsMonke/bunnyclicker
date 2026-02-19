@@ -8,9 +8,10 @@ enemyHopperBun = Enemy:extend()
 function enemyHopperBun:new(x, y)
     self.super.new(self,x,y)
     self.type = 'EnemyDasherBun'
+    self.ENEMYNAME = "HOPPERBUN"
     self:addToTags("EnemyDasherBun")
 
-    self.hpMax = 20
+    self.hpMax = 80
     self.hp = self.hpMax
     self.prevHp = self.hp
     self.image = require('assets').images.enemies.hopperBun.hopperbun_idle
@@ -92,7 +93,7 @@ function enemyHopperBun:update(dt)
     end
 
     self:updateCollisionTriangle(dt)
-    self:updatePlayingState()
+    self:updatePlayingState(dt)
     if self.isPlaying == true then
         self.world:update(self, self.x, self.y)
 
@@ -100,6 +101,7 @@ function enemyHopperBun:update(dt)
             
             if self.hopDelay > 0 then
                 self.hopDelay = self.hopDelay - dt
+
             end
 
             if self.hopDelay <= 0 then
@@ -107,6 +109,13 @@ function enemyHopperBun:update(dt)
                     self.hopsLeft = self.hopsLeft - 1
                     self.speed = self.speedMax
                     self.direction = self:getDirectionToObject(_G.player)
+                    for i=1, 6 do
+                        local Xnum = love.math.random(20, 600)
+                        local axe = require'src.projectiles.enemy.projectile_fallingAxe'(self.x, self.y, Xnum)
+                        
+
+                    end
+
             end
         end
 
@@ -118,7 +127,6 @@ function enemyHopperBun:update(dt)
 
             --RESET TO IDLE IF SPEED IS 0
             if self.speed <= 0 then
-                print("THIS IS RUNNING CORRECTLY")
 
                 if self.hopsLeft > 0 then
                     self.hopDelay = self.hopDelayMax
@@ -142,10 +150,12 @@ function enemyHopperBun:update(dt)
                 for i=1, len do
                     local col = cols[i]
                     local item = col.other
-        
-                    if col.other:is(Player) then
-                        if col.other.invicbility <= 0 then
-                            col.other:TakeDamage(1)
+                    
+                    if col.other.is then
+                        if col.other:is(Player) then
+                            if col.other.invicbility <= 0 then
+                                col.other:TakeDamage(1)
+                            end
                         end
                     end
                 end
@@ -160,10 +170,6 @@ function enemyHopperBun:update(dt)
                 self.restTime = self.restTimeMax
                 self.hopsLeft = self.hopsMax
             end
-        end
-
-        if self.hp <= 0 then
-            self:Die()
         end
 
     end
@@ -184,10 +190,12 @@ function enemyHopperBun:draw()
         if self.state == self.STATES.RESTING then
             love.graphics.draw(image, self.animFrames[self.frameToDraw], self.x, self.y)
         else
+        love.graphics.setColor(1, 1, 1, self.drawAlpha)
         love.graphics.draw(image, self.x, self.y)
+        love.graphics.setColor(1, 1, 1, 1)
         end
 
-        self:drawDebugHitbox()
+        --self:drawDebugHitbox()
     end
 end
 

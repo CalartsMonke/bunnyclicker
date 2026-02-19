@@ -36,9 +36,7 @@ function PlayerBulletStatic:update(dt)
                 local item = items[i]
 
                 if item:is(Enemy) then
-                    print("FOUND ENEMY")
                     if item.isPlaying then
-                        print("ITEM HAS TAKEN DAMAGE")
                         item:TakeDamage(self.damage, 0)
                         self.state = self.STATES.HIT
                     end

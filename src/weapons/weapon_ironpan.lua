@@ -197,7 +197,6 @@ function WeaponIronPan:use(owner, target)
     if self.state == 1 then
         self.barsSpawned = true
         self.target = target
-        print(self.target.hp)
         self.owner = owner
         if #self.hitBars <= 0 then
                 for i = 1, 4 do

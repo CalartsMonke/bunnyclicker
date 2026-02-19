@@ -41,21 +41,6 @@ function RoomLevel:SetRoomEntities(currentRoom)
  
         self.entityList = {}
         local list = self.entityList
-        dungeon:InstanceCreateOnCell(list, e1(), 1, 3)
-        dungeon:InstanceCreateOnCell(list, e3(), 4, 6)
-        dungeon:InstanceCreateOnCell(list, e1(), 12, 3)
-        dungeon:InstanceCreateOnCell(list, e2(), 9, 7)
-        dungeon:InstanceCreateOnCell(list, e1(), 5, 6)
-        dungeon:InstanceCreateOnCell(list, e1(), 1, 3)
-        dungeon:InstanceCreateOnCell(list, e3(), 4, 6)
-        dungeon:InstanceCreateOnCell(list, e1(), 12, 3)
-        dungeon:InstanceCreateOnCell(list, e2(), 9, 7)
-        dungeon:InstanceCreateOnCell(list, e1(), 5, 6)
-        dungeon:InstanceCreateOnCell(list, e1(), 1, 3)
-        dungeon:InstanceCreateOnCell(list, e3(), 4, 6)
-        dungeon:InstanceCreateOnCell(list, e1(), 12, 3)
-        dungeon:InstanceCreateOnCell(list, e2(), 9, 7)
-        dungeon:InstanceCreateOnCell(list, e1(), 5, 6)
 
     end
 

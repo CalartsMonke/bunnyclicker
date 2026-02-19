@@ -188,7 +188,6 @@ function RoomShop:update(dt)
         end
         if self.buyTimeCurrent >= self.buyTimeMax then
             local bindex = self.previewIndex
-            print(bindex)
             self:buySlot(bindex)
         end
 

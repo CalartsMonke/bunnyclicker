@@ -17,9 +17,6 @@ function ProgressBar.new(x, y, maxValue, incrementValue)
         if self.frameToDraw > #self.animFrames then
             self.frameToDraw = #self.animFrames
         end
-
-        print(self:getPercent())
-        print("FRAME TO DRAW IS"..self.frameToDraw)
     
     end
     

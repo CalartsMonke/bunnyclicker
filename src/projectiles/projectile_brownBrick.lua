@@ -20,7 +20,6 @@ function ProjectileBrownBrick:new(x, y)
     else
         self.direction = love.math.random(0, 100)
     end
-    print("THE DIRECTION IS "..self.direction)
     --self.direction = 90
 
 

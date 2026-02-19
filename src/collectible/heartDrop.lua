@@ -25,12 +25,10 @@ end
 function heartDrop:collect()
     if self.isActive == nil or self.isActive == true then
     self.state = self.states[2]
-    print("THIS ITEM WAS COLLECTED")
     end
 end
 
 function heartDrop:update(dt)
-    print("THIS ITEM IS IN STATE 2")
     if self.state == self.states[2] then
         self.currentTime = self.currentTime + dt
         if self.currentTime >= self.travelTime * 1.5 then

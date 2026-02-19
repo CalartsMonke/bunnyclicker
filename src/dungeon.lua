@@ -1,14 +1,14 @@
 Dungeon = Object:extend()
 local Room = require('src.room')
 local bossKey = require('src.collectible.keyBoss')
+local battleBox = _G.battleBox
 
 local assets = require('assets')
 
 local blueSquare = require('assets').images.blueRoomSquare
 
 local NAMES = {
-    "BACK ALLEY",
-    "DRUG STREET",
+    "OLD WEST",
 }
 
 function Dungeon:new()
@@ -23,7 +23,7 @@ function Dungeon:new()
     self.cellStartY = self.cellHeight
 
     self.name = NAMES[math.floor(love.math.random(1, #NAMES))]
-    self.level = 1
+    self.level = 6018090501404 
 
     self.STATES =
  {
@@ -54,37 +54,13 @@ function Dungeon:generateNew()
     local hasGivenKey = false
     local maxNormalRooms = 7
     local BossKey = bossKey
-    for i = 1, maxNormalRooms do
-        local newroom = Room
-        local newRoom = newroom(1, self)
 
-        local num = love.math.random(1, 3)
-        if num > 2 and hasGivenKey == false then
-            newRoom.prizeItem:Destroy()
-            newRoom.prizeItem = BossKey(200, 200)
-            newRoom.prizeItem.parentRoom = newRoom
-            hasGivenKey = true
-        end
-        if hasGivenKey == false and i == maxNormalRooms then
-            newRoom.prizeItem:Destroy()
-            newRoom.prizeItem = BossKey(200, 200)
-            newRoom.prizeItem.parentRoom = newRoom
-            hasGivenKey = true
-        end
-
-        newRoom.parentDungeon = self
-        table.insert(self.rooms, newRoom)
-
-    end
-    local shopRoom = require('src.roomShop')
-    shopRoom.parentDungeon = self
-    table.insert(self.rooms, shopRoom())
-
+--[[
     local bossRoom = require('src.roomBoss')
     local BossRoom = bossRoom
     bossRoom.parentDungeon = self
     table.insert(self.rooms, BossRoom())
-
+--]]
 
     --DO ROOM HEIGHT TABLES
     for i=1, #self.rooms do
@@ -169,6 +145,8 @@ end
 
 function Dungeon:update(dt)
     if self.state == self.STATES.ACTIVE then
+        battleBox:update(dt)
+        
     self.currentRoom = self.rooms[self.activeRoom]
     --Confirm a room to enter
     end
@@ -180,7 +158,7 @@ function Dungeon:update(dt)
         self.textAlpha = self.textAlpha - dt
 
         for i = 1, #self.roomsDisplay do
-           room = self.roomsDisplay[i]
+           local room = self.roomsDisplay[i]
            
            if self.previewRoom == i then
                 if room.height < 8 then
@@ -210,17 +188,20 @@ end
 
 function Dungeon:draw()
 
-    love.graphics.setColor(1, 1, 1, self.textAlpha)
-    love.graphics.setFont(require'assets'.fonts.dd16)
-    love.graphics.print("NEED KEY!", 200, 250)
-    love.graphics.setFont(require'assets'.fonts.ns13)
-    love.graphics.setColor(1, 1, 1, 1)
+
 
     if self.state == self.STATES.SELECTING then
         --DRAW BACKGROUND BASED ON CURRENT LEVEL
         love.graphics.setColor(1, 1, 1, 0.6)
-        love.graphics.draw(assets.images.backgrounds.dungeon.backalley1, 0, 0)
+        love.graphics.draw(assets.images.backgrounds.rooms.woody.wildwest, 0, 0)
         love.graphics.setColor(1, 1, 1, 1)
+
+        love.graphics.setColor(1, 1, 1, 1)
+        love.graphics.setFont(require'assets'.fonts.dd16)
+        love.graphics.print("HOLD SPACE", 220, 50)
+        love.graphics.setFont(require'assets'.fonts.ns13)
+        love.graphics.setColor(1, 1, 1, 1)
+
 
 
 
@@ -237,7 +218,7 @@ function Dungeon:draw()
 
         love.graphics.setFont(require'assets'.fonts.dd16)
         love.graphics.print(self.name, 460, 40)
-        love.graphics.print("LEVEL - "..self.level, 470, 10)
+        love.graphics.print("LEVEL - "..self.level, 380, 10)
         love.graphics.setFont(require'assets'.fonts.ns13)
 
         
@@ -264,7 +245,7 @@ function Dungeon:draw()
                 heightSep = -8
             end
 
-            love.graphics.draw(imageToDraw, 100 + i * 32, 10 + self.roomsDisplay[i].height)
+            love.graphics.draw(imageToDraw, 250 + i * 32, 10 + self.roomsDisplay[i].height)
         end
 
         --DEBUG
@@ -297,12 +278,18 @@ function Dungeon:draw()
                 love.graphics.setColor(1, 1, 1, 0.2)
                 --love.graphics.circle('fill', cx + 16, cy + 16, 10)
                 for i = 1, 14 do
-                   -- love.graphics.line(csx + (i-1) * self.cellWidth, csy, csx + (i-1) * self.cellWidth, (self.cellHeight * self.cellsVertical) + self.cellStartY)
+                   love.graphics.line(csx + (i-1) * self.cellWidth, csy, csx + (i-1) * self.cellWidth, (self.cellHeight * self.cellsVertical) + self.cellStartY)
                 end
                 for  i = 1, 10 do
-                    --love.graphics.line(csx, csy + (i-1) * self.cellHeight, self.cellStartX + self.cellsHorizontal * self.cellWidth , csy + (i-1) * self.cellHeight)
+                    love.graphics.line(csx, csy + (i-1) * self.cellHeight, self.cellStartX + self.cellsHorizontal * self.cellWidth , csy + (i-1) * self.cellHeight)
                 end
+
                 love.graphics.setColor(1, 1, 1, 1)
+                for i=4, 1, -1 do
+
+                end
+
+                battleBox:draw()
 
         self.rooms[self.activeRoom]:draw()
     end
